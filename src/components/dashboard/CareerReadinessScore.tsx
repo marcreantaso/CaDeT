@@ -1,9 +1,19 @@
 import { motion } from 'framer-motion';
 import { ProgressRing } from '../shared/ProgressRing';
-import { mockCareerTargets, mockExperiments, mockSkills, mockProjects, mockTasks } from '../../data/mock';
+import { useCareerTargets } from '../../hooks/useCareerTargets';
+import { useExperiments } from '../../hooks/useExperiments';
+import { useSkills } from '../../hooks/useSkills';
+import { useProjects } from '../../hooks/useProjects';
+import { useTasks } from '../../hooks/useTasks';
 import { calculateCareerReadiness } from '../../utils/scoring';
 
 export function CareerReadinessScore() {
+  const { targets: mockCareerTargets } = useCareerTargets();
+  const { experiments: mockExperiments } = useExperiments();
+  const { skills: mockSkills } = useSkills();
+  const { projects: mockProjects } = useProjects();
+  const { tasks: mockTasks } = useTasks();
+
   const readiness = calculateCareerReadiness(
     mockCareerTargets,
     mockExperiments,

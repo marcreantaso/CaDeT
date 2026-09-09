@@ -139,13 +139,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       profile: prev.profile ? { ...prev.profile, ...updates } as any : null,
       user: prev.user ? {
         ...prev.user,
-        onboardingCompleted: updates.onboarding_completed ?? prev.user.onboardingCompleted,
+        onboardingCompleted: updates.onboardingCompleted ?? prev.user.onboardingCompleted,
       } : null,
     }));
 
+    const dbUpdates: any = { ...updates };
+    if (updates.onboardingCompleted !== undefined) {
+      dbUpdates.onboarding_completed = updates.onboardingCompleted;
+      delete dbUpdates.onboardingCompleted;
+    }
+    if (updates.currentRole !== undefined) {
+      dbUpdates.current_role = updates.currentRole;
+      delete dbUpdates.currentRole;
+    }
+
     const { error } = await supabase
       .from('profiles')
-      .update(updates)
+      .update(dbUpdates)
       .eq('user_id', authState.user.id);
 
     if (error) {

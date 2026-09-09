@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp, AlertTriangle, CheckCircle, XCircle, HelpCircle } from 'lucide-react';
+import { Brain, TrendingUp, TrendingDown, Minus, ChevronDown, AlertTriangle, CheckCircle, XCircle, HelpCircle } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid
 } from 'recharts';
-import { mockForecasts, mockTrajectoryData, mockInsights } from '../data/mock';
+import { useInsights } from '../hooks/useInsights';
+import { useForecasts } from '../hooks/useForecasts';
 import { ConfidenceBadge } from '../components/shared/ConfidenceBadge';
 import { ExplanationCard } from '../components/shared/ExplanationCard';
 
@@ -17,15 +18,25 @@ const DIRECTION_COLORS: Record<string, string> = {
   'Data Engineering': 'hsl(45, 93%, 55%)',
 };
 
-const chartData = mockTrajectoryData.map(point => ({
-  date: new Date(point.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-  ...point.directions,
-}));
-
 export function InsightsPage() {
+  const { insights, isLoading: insightsLoading } = useInsights();
+  const { forecasts, isLoading: forecastsLoading } = useForecasts();
   const [expandedForecast, setExpandedForecast] = useState<string | null>(null);
 
-  const sortedForecasts = [...mockForecasts].sort((a, b) => b.confidence - a.confidence);
+  if (insightsLoading || forecastsLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="w-8 h-8 border-2 border-[hsl(262,83%,58%)] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Fallback static chart data for now since we don't have a trajectory history hook yet
+  const chartData = [
+    { date: 'Jul 1', 'Full-Stack Development': 20, 'AI Engineering': 10 },
+    { date: 'Aug 1', 'Full-Stack Development': 45, 'AI Engineering': 15 },
+    { date: 'Sep 1', 'Full-Stack Development': 68, 'AI Engineering': 35 },
+  ];
 
   return (
     <div className="space-y-6">
@@ -130,194 +141,219 @@ export function InsightsPage() {
           Direction Forecasts
         </h2>
 
-        <div className="space-y-3">
-          {sortedForecasts.map((forecast, index) => {
-            const isExpanded = expandedForecast === forecast.id;
-            const dirColor = DIRECTION_COLORS[forecast.direction] || 'hsl(262, 83%, 58%)';
-            const TrendIcon = forecast.trend === 'rising' ? TrendingUp : forecast.trend === 'declining' ? TrendingDown : Minus;
+        {forecasts.length === 0 ? (
+          <div className="text-center py-10 glass-card">
+            <p className="text-sm" style={{ color: 'hsl(215, 20%, 65%)' }}>Not enough data to generate forecasts.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {forecasts.map((forecast, index) => {
+              const isExpanded = expandedForecast === forecast.id;
+              const dirColor = DIRECTION_COLORS[forecast.direction] || 'hsl(262, 83%, 58%)';
+              const TrendIcon = forecast.trend === 'rising' ? TrendingUp : forecast.trend === 'declining' ? TrendingDown : Minus;
 
-            return (
-              <motion.div
-                key={forecast.id}
-                className="glass-card overflow-hidden"
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.06 }}
-              >
-                {/* Header */}
-                <div
-                  className="p-5 cursor-pointer"
-                  onClick={() => setExpandedForecast(isExpanded ? null : forecast.id)}
+              return (
+                <motion.div
+                  key={forecast.id}
+                  className="glass-card overflow-hidden"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.06 }}
                 >
-                  <div className="flex items-center gap-4">
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                      style={{ background: `${dirColor}12` }}
-                    >
-                      <Brain size={22} style={{ color: dirColor }} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="text-sm font-bold"
-                          style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}
-                        >
-                          {forecast.direction}
-                        </p>
-                        <TrendIcon size={14} style={{
-                          color: forecast.trend === 'rising' ? 'hsl(150, 70%, 45%)' :
-                            forecast.trend === 'declining' ? 'hsl(0, 72%, 51%)' : 'hsl(215, 15%, 45%)'
-                        }} />
+                  {/* Header */}
+                  <div
+                    className="p-5 cursor-pointer"
+                    onClick={() => setExpandedForecast(isExpanded ? null : forecast.id)}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div
+                        className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                        style={{ background: `${dirColor}12` }}
+                      >
+                        <Brain size={22} style={{ color: dirColor }} />
                       </div>
-                      <ConfidenceBadge value={forecast.confidence} />
-                    </div>
-
-                    {/* Confidence bar */}
-                    <div className="hidden md:block w-32">
-                      <div className="progress-bar" style={{ height: 8 }}>
-                        <motion.div
-                          className="progress-bar-fill"
-                          style={{ background: dirColor }}
-                          initial={{ width: 0 }}
-                          animate={{ width: `${forecast.confidence}%` }}
-                          transition={{ duration: 0.8, delay: 0.3 }}
-                        />
-                      </div>
-                    </div>
-
-                    <motion.div
-                      animate={{ rotate: isExpanded ? 180 : 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <ChevronDown size={18} style={{ color: 'hsl(215, 15%, 45%)' }} />
-                    </motion.div>
-                  </div>
-                </div>
-
-                {/* Expanded detail */}
-                <AnimatePresence>
-                  {isExpanded && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="px-5 pb-5 space-y-4" style={{ borderTop: '1px solid hsl(222, 25%, 16%)' }}>
-                        <div className="pt-4">
-                          <h4
-                            className="text-xs font-semibold uppercase tracking-wider mb-2"
-                            style={{ color: dirColor, fontFamily: 'var(--font-heading)' }}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="text-sm font-bold"
+                            style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}
                           >
-                            Why This Trajectory?
-                          </h4>
-                          <p className="text-xs leading-relaxed" style={{ color: 'hsl(215, 20%, 65%)' }}>
-                            {forecast.explanation}
+                            {forecast.direction}
                           </p>
+                          <TrendIcon size={14} style={{
+                            color: forecast.trend === 'rising' ? 'hsl(150, 70%, 45%)' :
+                              forecast.trend === 'declining' ? 'hsl(0, 72%, 51%)' : 'hsl(215, 15%, 45%)'
+                          }} />
                         </div>
+                        <ConfidenceBadge value={forecast.confidence} />
+                      </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {/* Positive Signals */}
-                          {forecast.positiveSignals.length > 0 && (
-                            <div className="p-3 rounded-xl" style={{ background: 'hsl(150, 70%, 45%, 0.06)' }}>
-                              <div className="flex items-center gap-1.5 mb-2">
-                                <CheckCircle size={12} style={{ color: 'hsl(150, 70%, 45%)' }} />
-                                <p className="text-[10px] font-semibold uppercase tracking-wider"
-                                  style={{ color: 'hsl(150, 70%, 45%)', fontFamily: 'var(--font-heading)' }}
-                                >
-                                  Positive Signals
-                                </p>
+                      {/* Confidence bar */}
+                      <div className="hidden md:block w-32">
+                        <div className="progress-bar" style={{ height: 8 }}>
+                          <motion.div
+                            className="progress-bar-fill"
+                            style={{ background: dirColor }}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${forecast.confidence}%` }}
+                            transition={{ duration: 0.8, delay: 0.3 }}
+                          />
+                        </div>
+                      </div>
+
+                      <motion.div
+                        animate={{ rotate: isExpanded ? 180 : 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <ChevronDown size={18} style={{ color: 'hsl(215, 15%, 45%)' }} />
+                      </motion.div>
+                    </div>
+                  </div>
+
+                  {/* Expanded detail */}
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-5 pb-5 space-y-4" style={{ borderTop: '1px solid hsl(222, 25%, 16%)' }}>
+                          <div className="pt-4">
+                            <h4
+                              className="text-xs font-semibold uppercase tracking-wider mb-2"
+                              style={{ color: dirColor, fontFamily: 'var(--font-heading)' }}
+                            >
+                              Why This Trajectory?
+                            </h4>
+                            <p className="text-xs leading-relaxed" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                              {forecast.explanation}
+                            </p>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {/* Positive Signals */}
+                            {forecast.positiveSignals && forecast.positiveSignals.length > 0 && (
+                              <div className="p-3 rounded-xl" style={{ background: 'hsl(150, 70%, 45%, 0.06)' }}>
+                                <div className="flex items-center gap-1.5 mb-2">
+                                  <CheckCircle size={12} style={{ color: 'hsl(150, 70%, 45%)' }} />
+                                  <p className="text-[10px] font-semibold uppercase tracking-wider"
+                                    style={{ color: 'hsl(150, 70%, 45%)', fontFamily: 'var(--font-heading)' }}
+                                  >
+                                    Positive Signals
+                                  </p>
+                                </div>
+                                <ul className="space-y-1">
+                                  {forecast.positiveSignals.map((s, i) => (
+                                    <li key={i} className="text-[11px]" style={{ color: 'hsl(215, 20%, 65%)' }}>• {s}</li>
+                                  ))}
+                                </ul>
                               </div>
-                              <ul className="space-y-1">
-                                {forecast.positiveSignals.map((s, i) => (
-                                  <li key={i} className="text-[11px]" style={{ color: 'hsl(215, 20%, 65%)' }}>• {s}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
+                            )}
 
-                          {/* Negative Signals */}
-                          {forecast.negativeSignals.length > 0 && (
-                            <div className="p-3 rounded-xl" style={{ background: 'hsl(0, 72%, 51%, 0.06)' }}>
-                              <div className="flex items-center gap-1.5 mb-2">
-                                <XCircle size={12} style={{ color: 'hsl(0, 72%, 51%)' }} />
-                                <p className="text-[10px] font-semibold uppercase tracking-wider"
-                                  style={{ color: 'hsl(0, 72%, 51%)', fontFamily: 'var(--font-heading)' }}
-                                >
-                                  Negative Signals
-                                </p>
+                            {/* Negative Signals */}
+                            {forecast.negativeSignals && forecast.negativeSignals.length > 0 && (
+                              <div className="p-3 rounded-xl" style={{ background: 'hsl(0, 72%, 51%, 0.06)' }}>
+                                <div className="flex items-center gap-1.5 mb-2">
+                                  <XCircle size={12} style={{ color: 'hsl(0, 72%, 51%)' }} />
+                                  <p className="text-[10px] font-semibold uppercase tracking-wider"
+                                    style={{ color: 'hsl(0, 72%, 51%)', fontFamily: 'var(--font-heading)' }}
+                                  >
+                                    Negative Signals
+                                  </p>
+                                </div>
+                                <ul className="space-y-1">
+                                  {forecast.negativeSignals.map((s, i) => (
+                                    <li key={i} className="text-[11px]" style={{ color: 'hsl(215, 20%, 65%)' }}>• {s}</li>
+                                  ))}
+                                </ul>
                               </div>
-                              <ul className="space-y-1">
-                                {forecast.negativeSignals.map((s, i) => (
-                                  <li key={i} className="text-[11px]" style={{ color: 'hsl(215, 20%, 65%)' }}>• {s}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
+                            )}
 
-                          {/* Behavioral Evidence */}
-                          {forecast.behavioralEvidence.length > 0 && (
-                            <div className="p-3 rounded-xl" style={{ background: 'hsl(262, 83%, 58%, 0.06)' }}>
-                              <p className="text-[10px] font-semibold uppercase tracking-wider mb-2"
-                                style={{ color: 'hsl(262, 83%, 68%)', fontFamily: 'var(--font-heading)' }}
-                              >
-                                Behavioral Evidence
-                              </p>
-                              <ul className="space-y-1">
-                                {forecast.behavioralEvidence.map((s, i) => (
-                                  <li key={i} className="text-[11px]" style={{ color: 'hsl(215, 20%, 65%)' }}>• {s}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
+                            {/* Behavioral Evidence */}
+                            {forecast.behavioralEvidence && forecast.behavioralEvidence.length > 0 && (
+                              <div className="p-3 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
+                                <p className="text-[10px] font-semibold uppercase tracking-wider mb-2"
+                                  style={{ color: 'hsl(262, 83%, 68%)', fontFamily: 'var(--font-heading)' }}
+                                >
+                                  Behavioral Evidence
+                                </p>
+                                <ul className="space-y-1">
+                                  {forecast.behavioralEvidence.map((s: string, i: number) => (
+                                    <li key={i} className="text-[11px]" style={{ color: 'hsl(215, 20%, 65%)' }}>• {s}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
 
-                          {/* Missing Evidence */}
-                          {forecast.missingEvidence.length > 0 && (
-                            <div className="p-3 rounded-xl" style={{ background: 'hsl(45, 93%, 55%, 0.06)' }}>
-                              <div className="flex items-center gap-1.5 mb-2">
-                                <AlertTriangle size={12} style={{ color: 'hsl(45, 93%, 55%)' }} />
-                                <p className="text-[10px] font-semibold uppercase tracking-wider"
+                            {/* Experiment Results */}
+                            {forecast.experimentResults && forecast.experimentResults.length > 0 && (
+                              <div className="p-3 rounded-xl col-span-1 md:col-span-2" style={{ background: 'hsl(222, 30%, 12%)' }}>
+                                <p className="text-[10px] font-semibold uppercase tracking-wider mb-2"
                                   style={{ color: 'hsl(45, 93%, 55%)', fontFamily: 'var(--font-heading)' }}
                                 >
-                                  Missing Evidence
+                                  Experiment Results
                                 </p>
+                                <ul className="space-y-1">
+                                  {forecast.experimentResults.map((s: string, i: number) => (
+                                    <li key={i} className="text-xs flex items-start gap-2" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                                      <span className="text-[10px] mt-0.5">•</span>
+                                      {s}
+                                    </li>
+                                  ))}
+                                </ul>
                               </div>
-                              <ul className="space-y-1">
-                                {forecast.missingEvidence.map((s, i) => (
-                                  <li key={i} className="text-[11px]" style={{ color: 'hsl(215, 20%, 65%)' }}>• {s}</li>
+                            )}
+
+                            {/* Missing Evidence */}
+                            {forecast.missingEvidence && forecast.missingEvidence.length > 0 && (
+                              <div className="p-3 rounded-xl" style={{ background: 'hsl(45, 93%, 55%, 0.06)' }}>
+                                <div className="flex items-center gap-1.5 mb-2">
+                                  <AlertTriangle size={12} style={{ color: 'hsl(45, 93%, 55%)' }} />
+                                  <p className="text-[10px] font-semibold uppercase tracking-wider"
+                                    style={{ color: 'hsl(45, 93%, 55%)', fontFamily: 'var(--font-heading)' }}
+                                  >
+                                    Missing Evidence
+                                  </p>
+                                </div>
+                                <ul className="space-y-1">
+                                  {forecast.missingEvidence.map((s: string, i: number) => (
+                                    <li key={i} className="text-[11px]" style={{ color: 'hsl(215, 20%, 65%)' }}>• {s}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Skill Evidence */}
+                          {forecast.skillEvidence && forecast.skillEvidence.length > 0 && (
+                            <div>
+                              <p className="text-[10px] font-semibold uppercase tracking-wider mb-2"
+                                style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+                              >
+                                Skill Evidence
+                              </p>
+                              <div className="flex flex-wrap gap-1.5">
+                                {forecast.skillEvidence.map((s: string, i: number) => (
+                                  <span key={i} className="text-[10px] px-2 py-1 rounded-lg"
+                                    style={{ background: 'hsl(222, 30%, 14%)', color: 'hsl(215, 20%, 65%)', border: '1px solid hsl(222, 25%, 18%)' }}
+                                  >
+                                    {s}
+                                  </span>
                                 ))}
-                              </ul>
+                              </div>
                             </div>
                           )}
                         </div>
-
-                        {/* Skill Evidence */}
-                        {forecast.skillEvidence.length > 0 && (
-                          <div>
-                            <p className="text-[10px] font-semibold uppercase tracking-wider mb-2"
-                              style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
-                            >
-                              Skill Evidence
-                            </p>
-                            <div className="flex flex-wrap gap-1.5">
-                              {forecast.skillEvidence.map((s, i) => (
-                                <span key={i} className="text-[10px] px-2 py-1 rounded-lg"
-                                  style={{ background: 'hsl(222, 30%, 14%)', color: 'hsl(215, 20%, 65%)', border: '1px solid hsl(222, 25%, 18%)' }}
-                                >
-                                  {s}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            );
-          })}
-        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* AI Insights Section */}
@@ -329,22 +365,28 @@ export function InsightsPage() {
           AI-Generated Insights
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {mockInsights.map((insight) => (
-            <ExplanationCard
-              key={insight.id}
-              title={insight.title}
-              explanation={insight.explanation}
-              evidence={insight.evidence}
-              actions={insight.actionItems}
-              accentColor={
-                insight.type === 'pattern_detected' ? 'hsl(262, 83%, 58%)' :
-                insight.type === 'skill_gap' ? 'hsl(0, 72%, 51%)' :
-                'hsl(172, 66%, 50%)'
-              }
-            />
-          ))}
-        </div>
+        {insights.length === 0 ? (
+          <div className="text-center py-10 glass-card">
+            <p className="text-sm" style={{ color: 'hsl(215, 20%, 65%)' }}>No AI insights generated yet.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {insights.map((insight) => (
+              <ExplanationCard
+                key={insight.id}
+                title={insight.title}
+                explanation={insight.explanation}
+                evidence={insight.evidence}
+                actions={insight.actionItems}
+                accentColor={
+                  insight.type === 'pattern_detected' ? 'hsl(262, 83%, 58%)' :
+                  insight.type === 'skill_gap' ? 'hsl(0, 72%, 51%)' :
+                  'hsl(172, 66%, 50%)'
+                }
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

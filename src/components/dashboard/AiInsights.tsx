@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Brain, ChevronRight, AlertTriangle, TrendingUp, Lightbulb } from 'lucide-react';
-import { mockInsights } from '../../data/mock';
+import { useInsights } from '../../hooks/useInsights';
+import type { AiInsight } from '../../types/insights';
 
 const INSIGHT_ICONS: Record<string, typeof Brain> = {
   pattern_detected: Lightbulb,
@@ -19,7 +20,8 @@ const INSIGHT_COLORS: Record<string, string> = {
 };
 
 export function AiInsights() {
-  const latestInsights = mockInsights.slice(0, 3);
+  const { insights } = useInsights();
+  const latestInsights = insights.slice(0, 3);
 
   return (
     <motion.div
@@ -38,13 +40,13 @@ export function AiInsights() {
         <div className="flex items-center gap-1">
           <Brain size={12} style={{ color: 'hsl(262, 83%, 58%)' }} />
           <span className="text-[10px]" style={{ color: 'hsl(262, 83%, 68%)' }}>
-            {mockInsights.filter(i => !i.isRead).length} new
+            {insights.filter(i => !i.isRead).length} new
           </span>
         </div>
       </div>
 
       <div className="space-y-3">
-        {latestInsights.map((insight, index) => {
+        {latestInsights.map((insight: AiInsight, index: number) => {
           const IconComponent = INSIGHT_ICONS[insight.type] || Brain;
           const color = INSIGHT_COLORS[insight.type] || 'hsl(262, 83%, 58%)';
 
@@ -74,9 +76,17 @@ export function AiInsights() {
                       <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: color }} />
                     )}
                   </div>
-                  <p className="text-[11px] mt-1 leading-relaxed" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                  <p className="text-[11px] mt-1 mb-2 leading-relaxed" style={{ color: 'hsl(215, 20%, 65%)' }}>
                     {insight.description}
                   </p>
+                  <ul className="space-y-1">
+                    {insight.evidence.map((e: string, i: number) => (
+                      <li key={i} className="text-xs flex items-start gap-2" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                        <span className="text-[10px] mt-0.5" style={{ color: INSIGHT_COLORS[insight.type as keyof typeof INSIGHT_COLORS] }}>•</span>
+                        {e}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
 

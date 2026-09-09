@@ -3,8 +3,7 @@ import {
   AreaChart, Area, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid
 } from 'recharts';
-import { mockTrajectoryData } from '../../data/mock';
-
+// Transform trajectory data for Recharts
 const DIRECTION_COLORS: Record<string, string> = {
   'Full-Stack Development': 'hsl(262, 83%, 58%)',
   'AI Engineering': 'hsl(172, 66%, 50%)',
@@ -13,13 +12,8 @@ const DIRECTION_COLORS: Record<string, string> = {
   'Data Engineering': 'hsl(45, 93%, 55%)',
 };
 
-// Transform trajectory data for Recharts
-const chartData = mockTrajectoryData.map(point => ({
-  date: new Date(point.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-  ...point.directions,
-}));
-
-const directions = Object.keys(mockTrajectoryData[0]?.directions || {});
+const chartData: any[] = [];
+const directions: string[] = [];
 
 interface CustomTooltipProps {
   active?: boolean;

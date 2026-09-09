@@ -25,6 +25,7 @@ export function useCareerTargets() {
       // Map DB snake_case to frontend camelCase
       const mappedTargets: CareerTarget[] = data.map((d: any) => ({
         id: d.id,
+        userId: user.id,
         originalGoal: d.original_goal,
         compressedTarget: d.compressed_target,
         roleClarity: d.role_clarity,
@@ -52,9 +53,7 @@ export function useCareerTargets() {
 
   useRealtimeSubscription({
     table: 'career_targets',
-    onUpdate: (payload) => {
-      // Simplest way to ensure we have the computed `overall_clarity` is to refetch
-      // or we can optimistically map payload.new
+    onUpdate: () => {
       fetchTargets();
     },
     filter: user ? `user_id=eq.${user.id}` : undefined,

@@ -1,5 +1,4 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from '../types/supabase'; // We'll assume a generated types file or standard any for now
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'http://localhost:54321'; // Default local supabase
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlZmF1bHQiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTYxNjQ4NTI0MCwiZXhwIjoxOTMyMDYxMjQwfQ.eyJ1c2VyX2lkIjoiZGVmYXVsdCJ9'; // Default local anon key

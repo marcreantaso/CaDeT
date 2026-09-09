@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion';
 import { FlaskConical, Clock, CheckCircle } from 'lucide-react';
-import { mockExperiments } from '../../data/mock';
+import { useExperiments } from '../../hooks/useExperiments';
 
 export function CurrentExperiments() {
+  const { experiments } = useExperiments();
+
   return (
     <motion.div
       className="glass-card p-5"
@@ -18,12 +20,12 @@ export function CurrentExperiments() {
           Experiments
         </h3>
         <span className="badge badge-warning">
-          {mockExperiments.filter(e => e.status === 'active').length} active
+          {experiments.filter(e => e.status === 'active').length} active
         </span>
       </div>
 
       <div className="space-y-3">
-        {mockExperiments.map((exp, index) => {
+        {experiments.map((exp: any, index: number) => {
           const isActive = exp.status === 'active';
           const isCompleted = exp.status === 'completed';
 

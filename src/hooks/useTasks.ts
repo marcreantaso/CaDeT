@@ -2,20 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useRealtimeSubscription } from './useRealtimeSubscription';
-
-export interface Task {
-  id: string;
-  title: string;
-  reason: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'deferred';
-  priority: 'high' | 'medium' | 'low';
-  createdAt: string;
-  linkedTargetId?: string;
-}
+import type { CareerTask } from '../types/career';
 
 export function useTasks() {
   const { user } = useAuth();
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<CareerTask[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -31,14 +22,17 @@ export function useTasks() {
 
       if (fetchError) throw fetchError;
 
-      const mappedTasks: Task[] = data.map((d: any) => ({
+      const mappedTasks: CareerTask[] = data.map((d: any) => ({
         id: d.id,
+        userId: user.id,
         title: d.title,
         reason: d.reason,
         status: d.status,
         priority: d.priority,
         createdAt: d.created_at,
+        updatedAt: d.updated_at,
         linkedTargetId: d.linked_target_id,
+        period: d.period || 'one_time',
       }));
 
       setTasks(mappedTasks);
@@ -59,7 +53,7 @@ export function useTasks() {
     filter: user ? `user_id=eq.${user.id}` : undefined,
   });
 
-  const addTask = async (task: Omit<Task, 'id' | 'createdAt'>) => {
+  const addTask = async (task: Omit<CareerTask, 'id' | 'createdAt' | 'updatedAt' | 'userId'>) => {
     if (!user) return;
     const { error: insertError } = await supabase.from('tasks').insert({
       user_id: user.id,
@@ -68,11 +62,12 @@ export function useTasks() {
       status: task.status,
       priority: task.priority,
       linked_target_id: task.linkedTargetId,
+      period: task.period,
     });
     if (insertError) throw insertError;
   };
 
-  const updateTask = async (id: string, updates: Partial<Task>) => {
+  const updateTask = async (id: string, updates: Partial<CareerTask>) => {
     const dbUpdates: any = {};
     if (updates.title !== undefined) dbUpdates.title = updates.title;
     if (updates.reason !== undefined) dbUpdates.reason = updates.reason;

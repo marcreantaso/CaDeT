@@ -42,10 +42,10 @@ export function OnboardingPage() {
     try {
       // 1. Update Profile
       await updateProfile({
-        current_role: currentRole,
-        years_experience: yearsExperience,
-        onboarding_completed: true,
-        onboarding_step: STEPS.length,
+        currentRole: currentRole,
+        yearsExperience: yearsExperience,
+        onboardingCompleted: true,
+        onboardingStep: STEPS.length,
       });
 
       // 2. Add Skills
@@ -137,7 +137,7 @@ export function OnboardingPage() {
         </div>
 
         <div className="space-y-4">
-          {STEPS.map((s, index) => {
+          {STEPS.map((s) => {
             const Icon = s.icon;
             const isActive = step === s.id;
             const isPast = step > s.id;

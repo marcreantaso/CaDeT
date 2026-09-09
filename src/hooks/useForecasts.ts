@@ -24,19 +24,19 @@ export function useForecasts() {
 
       const mappedForecasts: CareerForecast[] = data.map((d: any) => ({
         id: d.id,
+        userId: user.id,
         direction: d.direction,
         confidence: d.confidence,
         trend: d.trend,
         positiveSignals: d.positive_signals || [],
         negativeSignals: d.negative_signals || [],
-        evidence: {
-          behavioral: d.behavioral_evidence || [],
-          skills: d.skill_evidence || [],
-          experiments: d.experiment_results || [],
-          missing: d.missing_evidence || [],
-        },
+        behavioralEvidence: d.behavioral_evidence || [],
+        skillEvidence: d.skill_evidence || [],
+        experimentResults: d.experiment_results || [],
+        missingEvidence: d.missing_evidence || [],
         explanation: d.explanation,
-        lastUpdated: d.updated_at,
+        createdAt: d.created_at,
+        updatedAt: d.updated_at,
       }));
 
       setForecasts(mappedForecasts);

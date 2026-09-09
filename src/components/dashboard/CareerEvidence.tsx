@@ -1,10 +1,11 @@
 import { motion } from 'framer-motion';
-import { FolderKanban, Trophy, ExternalLink } from 'lucide-react';
-import { mockProjects, mockAchievements } from '../../data/mock';
+import { ExternalLink, FolderKanban, Trophy } from 'lucide-react';
+import { useProjects } from '../../hooks/useProjects';
 
 export function CareerEvidence() {
-  const recentProjects = mockProjects.slice(0, 3);
-  const recentAchievements = mockAchievements.slice(0, 2);
+  const { projects } = useProjects();
+  const recentProjects = projects.slice(0, 3);
+  const recentAchievements: any[] = [];
 
   return (
     <motion.div

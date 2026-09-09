@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useRealtimeSubscription } from './useRealtimeSubscription';
-import type { AIInsight } from '../types/career';
+import type { AiInsight } from '../types/insights';
 
 export function useInsights() {
   const { user } = useAuth();
-  const [insights, setInsights] = useState<AIInsight[]>([]);
+  const [insights, setInsights] = useState<AiInsight[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -22,8 +22,9 @@ export function useInsights() {
 
       if (fetchError) throw fetchError;
 
-      const mappedInsights: AIInsight[] = data.map((d: any) => ({
+      const mappedInsights: AiInsight[] = data.map((d: any) => ({
         id: d.id,
+        userId: user.id,
         type: d.type,
         title: d.title,
         description: d.description,

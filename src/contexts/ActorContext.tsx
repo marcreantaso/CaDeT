@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, useCallback, type React
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
 import { useRealtimeSubscription } from '../hooks/useRealtimeSubscription';
-import type { ActorState, ActorStage, ActorEvent } from '../types/actor';
+import { ACTOR_STAGE_META, type ActorState, type ActorStage, type ActorEvent, type ActorEventType } from '../types/actor';
 
 interface ActorContextType {
   actorState: ActorState | null;
@@ -11,7 +11,7 @@ interface ActorContextType {
   isLoading: boolean;
   setActiveStage: (stage: ActorStage) => Promise<void>;
   completeStage: (stage: ActorStage) => Promise<void>;
-  addEvent: (event: Omit<ActorEvent, 'id' | 'createdAt'>) => Promise<void>;
+  addEvent: (event: Omit<ActorEvent, 'id' | 'createdAt' | 'userId'>) => Promise<void>;
   selectedStage: ActorStage | null;
   setSelectedStage: (stage: ActorStage | null) => void;
 }
@@ -19,16 +19,19 @@ interface ActorContextType {
 const ActorContext = createContext<ActorContextType | null>(null);
 
 const DEFAULT_STATE: ActorState = {
+  id: 'default',
+  userId: 'default',
   currentStage: 'aim',
   stages: {
-    aim: { status: 'active', progress: 0 },
-    compress: { status: 'locked', progress: 0 },
-    test: { status: 'locked', progress: 0 },
-    own: { status: 'locked', progress: 0 },
-    run: { status: 'locked', progress: 0 },
+    aim: { ...ACTOR_STAGE_META.aim, id: 'aim', icon: 'aim', status: 'active', progress: 0 },
+    compress: { ...ACTOR_STAGE_META.compress, id: 'compress', icon: 'compress', status: 'locked', progress: 0 },
+    test: { ...ACTOR_STAGE_META.test, id: 'test', icon: 'test', status: 'locked', progress: 0 },
+    own: { ...ACTOR_STAGE_META.own, id: 'own', icon: 'own', status: 'locked', progress: 0 },
+    run: { ...ACTOR_STAGE_META.run, id: 'run', icon: 'run', status: 'locked', progress: 0 },
   },
   cycleCount: 1,
   lastTransition: new Date().toISOString(),
+  createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };
 
@@ -60,20 +63,23 @@ export function ActorProvider({ children }: { children: ReactNode }) {
 
       if (stateData) {
         setActorState({
+          id: stateData.id,
+          userId: stateData.user_id,
           currentStage: stateData.current_stage as ActorStage,
           stages: {
-            aim: { status: stateData.aim_status, progress: stateData.aim_progress },
-            compress: { status: stateData.compress_status, progress: stateData.compress_progress },
-            test: { status: stateData.test_status, progress: stateData.test_progress },
-            own: { status: stateData.own_status, progress: stateData.own_progress },
-            run: { status: stateData.run_status, progress: stateData.run_progress },
+            aim: { ...ACTOR_STAGE_META.aim, id: 'aim', icon: 'aim', status: stateData.aim_status, progress: stateData.aim_progress },
+            compress: { ...ACTOR_STAGE_META.compress, id: 'compress', icon: 'compress', status: stateData.compress_status, progress: stateData.compress_progress },
+            test: { ...ACTOR_STAGE_META.test, id: 'test', icon: 'test', status: stateData.test_status, progress: stateData.test_progress },
+            own: { ...ACTOR_STAGE_META.own, id: 'own', icon: 'own', status: stateData.own_status, progress: stateData.own_progress },
+            run: { ...ACTOR_STAGE_META.run, id: 'run', icon: 'run', status: stateData.run_status, progress: stateData.run_progress },
           },
           cycleCount: stateData.cycle_count,
           lastTransition: stateData.last_transition,
+          createdAt: stateData.created_at,
           updatedAt: stateData.updated_at,
         });
       } else {
-        setActorState(DEFAULT_STATE);
+        setActorState({ ...DEFAULT_STATE, userId: user.id });
       }
 
       // Fetch Events
@@ -87,12 +93,13 @@ export function ActorProvider({ children }: { children: ReactNode }) {
 
       setEvents(eventData.map(e => ({
         id: e.id,
+        userId: e.user_id,
         stage: e.stage as ActorStage,
-        type: e.event_type,
+        eventType: e.event_type as ActorEventType,
         title: e.title,
         description: e.description,
-        createdAt: e.created_at,
         metadata: e.metadata,
+        createdAt: e.created_at,
       })));
 
     } catch (err) {
@@ -153,12 +160,12 @@ export function ActorProvider({ children }: { children: ReactNode }) {
     await supabase.from('actor_states').update(updates).eq('user_id', user.id);
   };
 
-  const addEvent = async (event: Omit<ActorEvent, 'id' | 'createdAt'>) => {
+  const addEvent = async (event: Omit<ActorEvent, 'id' | 'createdAt' | 'userId'>) => {
     if (!user) return;
     await supabase.from('actor_events').insert({
       user_id: user.id,
       stage: event.stage,
-      event_type: event.type,
+      event_type: event.eventType,
       title: event.title,
       description: event.description,
       metadata: event.metadata || {},
@@ -187,3 +194,4 @@ export function useActor() {
   if (!context) throw new Error('useActor must be used within ActorProvider');
   return context;
 }
+

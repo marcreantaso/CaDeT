@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useRealtimeSubscription } from './useRealtimeSubscription';
-import type { CareerExperiment } from '../types/career';
+import type { Experiment } from '../types/career';
 
 export function useExperiments() {
   const { user } = useAuth();
-  const [experiments, setExperiments] = useState<CareerExperiment[]>([]);
+  const [experiments, setExperiments] = useState<Experiment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -22,11 +22,13 @@ export function useExperiments() {
 
       if (fetchError) throw fetchError;
 
-      const mappedExps: CareerExperiment[] = data.map((d: any) => ({
+      const mappedExps: Experiment[] = data.map((d: any) => ({
         id: d.id,
+        userId: user.id,
         hypothesis: d.hypothesis,
         experiment: d.experiment,
         timeline: d.timeline,
+        startDate: d.start_date || d.created_at,
         status: d.status,
         linkedTargetId: d.linked_target_id,
         scores: d.interest_score != null ? {
@@ -36,8 +38,10 @@ export function useExperiments() {
           confidence: d.confidence_score,
           performance: d.performance_score,
           wouldRepeat: d.would_repeat,
-        } : undefined,
+        } : null,
         reflection: d.reflection,
+        createdAt: d.created_at,
+        updatedAt: d.updated_at,
       }));
 
       setExperiments(mappedExps);
@@ -58,7 +62,7 @@ export function useExperiments() {
     filter: user ? `user_id=eq.${user.id}` : undefined,
   });
 
-  const addExperiment = async (exp: Omit<CareerExperiment, 'id' | 'scores' | 'reflection'>) => {
+  const addExperiment = async (exp: Omit<Experiment, 'id' | 'scores' | 'reflection' | 'createdAt' | 'updatedAt' | 'userId'>) => {
     if (!user) return;
     const { error: insertError } = await supabase.from('experiments').insert({
       user_id: user.id,
@@ -71,7 +75,7 @@ export function useExperiments() {
     if (insertError) throw insertError;
   };
 
-  const updateExperiment = async (id: string, updates: Partial<CareerExperiment>) => {
+  const updateExperiment = async (id: string, updates: Partial<Experiment>) => {
     const dbUpdates: any = {};
     if (updates.hypothesis !== undefined) dbUpdates.hypothesis = updates.hypothesis;
     if (updates.experiment !== undefined) dbUpdates.experiment = updates.experiment;

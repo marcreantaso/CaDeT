@@ -1,10 +1,11 @@
 import { motion } from 'framer-motion';
 import { Zap, TrendingUp } from 'lucide-react';
-import { mockSkills } from '../../data/mock';
+import { useSkills } from '../../hooks/useSkills';
 import { SKILL_LEVEL_COLORS, type SkillLevel } from '../../types/skills';
 
 export function SkillDevelopment() {
-  const topSkills = [...mockSkills]
+  const { skills } = useSkills();
+  const topSkills = [...skills]
     .sort((a, b) => b.confidence - a.confidence)
     .slice(0, 5);
 
@@ -23,12 +24,12 @@ export function SkillDevelopment() {
           Skill Development
         </h3>
         <span className="badge badge-info">
-          <Zap size={10} /> {mockSkills.length} skills
+          <Zap size={10} /> {skills.length} skills
         </span>
       </div>
 
       <div className="space-y-3">
-        {topSkills.map((skill, index) => {
+        {topSkills.map((skill: any, index: number) => {
           const levelColor = SKILL_LEVEL_COLORS[skill.level as SkillLevel];
           return (
             <motion.div

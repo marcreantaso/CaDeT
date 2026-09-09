@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useRealtimeSubscription } from './useRealtimeSubscription';
-import type { Skill } from '../types/skills';
+import type { UserSkill, SkillCategory, SkillLevel } from '../types/skills';
 
 export function useSkills() {
   const { user } = useAuth();
-  const [skills, setSkills] = useState<Skill[]>([]);
+  const [skills, setSkills] = useState<UserSkill[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -14,7 +14,6 @@ export function useSkills() {
     if (!user) return;
     try {
       setIsLoading(true);
-      // We need to join user_skills with skills master table
       const { data, error: fetchError } = await supabase
         .from('user_skills')
         .select(`
@@ -33,16 +32,20 @@ export function useSkills() {
 
       if (fetchError) throw fetchError;
 
-      const mappedSkills: Skill[] = data.map((d: any) => ({
-        id: d.id, // the user_skill id
+      const mappedSkills: UserSkill[] = data.map((d: any) => ({
+        id: d.id,
+        userId: user.id,
         skillId: d.skills.id,
         skillName: d.skills.name,
-        category: d.skills.category,
-        level: d.level,
+        category: d.skills.category as SkillCategory,
+        level: d.level as SkillLevel,
         confidence: d.confidence,
-        evidenceCount: d.evidence_count,
+        evidenceCount: d.evidence_count || 0,
         lastPracticed: d.last_practiced,
-        linkedProjects: [], // Would fetch from project_skills or similar if available
+        linkedProjects: [],
+        linkedExperiments: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       }));
 
       setSkills(mappedSkills);
@@ -67,7 +70,6 @@ export function useSkills() {
     if (!user) return;
 
     try {
-      // Find or create in master skills table
       let skillId;
       const { data: existingSkill } = await supabase
         .from('skills')
@@ -87,7 +89,6 @@ export function useSkills() {
         skillId = newSkill.id;
       }
 
-      // Add to user_skills
       const { error: insertError } = await supabase.from('user_skills').insert({
         user_id: user.id,
         skill_id: skillId,
@@ -102,7 +103,7 @@ export function useSkills() {
     }
   };
 
-  const updateSkill = async (id: string, updates: Partial<Skill>) => {
+  const updateSkill = async (id: string, updates: Partial<UserSkill>) => {
     const dbUpdates: any = {};
     if (updates.level !== undefined) dbUpdates.level = updates.level;
     if (updates.confidence !== undefined) dbUpdates.confidence = updates.confidence;
@@ -127,3 +128,4 @@ export function useSkills() {
     deleteSkill,
   };
 }
+

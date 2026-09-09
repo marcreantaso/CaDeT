@@ -1,9 +1,14 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Check, ChevronRight, Target, Crosshair, FlaskConical, Crown, Rocket, ArrowRight, X } from 'lucide-react';
+import { Lock, Check, ChevronRight, Target, Crosshair, FlaskConical, Crown, Rocket, ArrowRight } from 'lucide-react';
 import { useActor } from '../contexts/ActorContext';
 import { ACTOR_STAGES, ACTOR_STAGE_META, ACTOR_CYCLE, type ActorStage } from '../types/actor';
-import { mockCareerGoals, mockCareerTargets, mockExperiments, mockProjects, mockSkills, mockTasks, mockActorEvents } from '../data/mock';
+import { useCareerGoals } from '../hooks/useCareerGoals';
+import { useCareerTargets } from '../hooks/useCareerTargets';
+import { useExperiments } from '../hooks/useExperiments';
+import { useProjects } from '../hooks/useProjects';
+import { useSkills } from '../hooks/useSkills';
+import { useTasks } from '../hooks/useTasks';
 import { formatRelativeDate } from '../utils/formatting';
 
 const STAGE_ICONS: Record<string, typeof Target> = {
@@ -15,8 +20,16 @@ const STAGE_ICONS: Record<string, typeof Target> = {
 };
 
 export function JourneyPage() {
-  const { actorState } = useActor();
+  const { actorState, events } = useActor();
   const [openStage, setOpenStage] = useState<ActorStage | null>(null);
+
+  if (!actorState) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="w-8 h-8 border-2 border-[hsl(262,83%,58%)] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -78,7 +91,7 @@ export function JourneyPage() {
           const isCompleted = stage.status === 'completed';
           const isActive = stage.status === 'active';
           const isLocked = stage.status === 'locked';
-          const stageEvents = mockActorEvents.filter(e => e.stage === stageId);
+          const stageEvents = events.filter(e => e.stage === stageId);
 
           return (
             <motion.div
@@ -231,13 +244,15 @@ export function JourneyPage() {
 // === Stage Workflow Contents ===
 
 function AimContent() {
+  const { goals } = useCareerGoals();
+  
   const categories = [
-    { label: 'Ambitions', items: mockCareerGoals.filter(g => g.category === 'ambition') },
-    { label: 'Desired Roles', items: mockCareerGoals.filter(g => g.category === 'role') },
-    { label: 'Interests', items: mockCareerGoals.filter(g => g.category === 'interest') },
-    { label: 'Values', items: mockCareerGoals.filter(g => g.category === 'value') },
-    { label: 'Environment', items: mockCareerGoals.filter(g => g.category === 'environment') },
-    { label: 'Industries', items: mockCareerGoals.filter(g => g.category === 'industry') },
+    { label: 'Ambitions', items: goals.filter(g => g.category === 'ambition') },
+    { label: 'Desired Roles', items: goals.filter(g => g.category === 'role') },
+    { label: 'Interests', items: goals.filter(g => g.category === 'interest') },
+    { label: 'Values', items: goals.filter(g => g.category === 'value') },
+    { label: 'Environment', items: goals.filter(g => g.category === 'environment') },
+    { label: 'Industries', items: goals.filter(g => g.category === 'industry') },
   ];
 
   return (
@@ -245,127 +260,155 @@ function AimContent() {
       <p className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>
         Career ambitions, interests, values, and preferences collected during the AIM stage.
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {categories.filter(c => c.items.length > 0).map(cat => (
-          <div key={cat.label} className="p-3 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
-            <p className="text-[10px] font-semibold uppercase tracking-wider mb-2"
-              style={{ color: 'hsl(262, 83%, 68%)', fontFamily: 'var(--font-heading)' }}
-            >
-              {cat.label}
-            </p>
-            {cat.items.map(goal => (
-              <div key={goal.id} className="mb-2">
-                <p className="text-xs font-medium" style={{ color: 'hsl(210, 40%, 96%)' }}>{goal.title}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: 'hsl(215, 15%, 45%)' }}>{goal.description}</p>
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
+      
+      {goals.length === 0 ? (
+        <div className="p-4 rounded-xl text-center" style={{ background: 'hsl(222, 30%, 12%)' }}>
+          <p className="text-sm" style={{ color: 'hsl(215, 20%, 65%)' }}>No goals defined yet.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {categories.filter(c => c.items.length > 0).map(cat => (
+            <div key={cat.label} className="p-3 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
+              <p className="text-[10px] font-semibold uppercase tracking-wider mb-2"
+                style={{ color: 'hsl(262, 83%, 68%)', fontFamily: 'var(--font-heading)' }}
+              >
+                {cat.label}
+              </p>
+              {cat.items.map(goal => (
+                <div key={goal.id} className="mb-2">
+                  <p className="text-xs font-medium" style={{ color: 'hsl(210, 40%, 96%)' }}>{goal.title}</p>
+                  <p className="text-[10px] mt-0.5" style={{ color: 'hsl(215, 15%, 45%)' }}>{goal.description}</p>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
 function CompressContent() {
+  const { targets } = useCareerTargets();
+  
   return (
     <div className="space-y-4">
       <p className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>
         Vague ambitions transformed into measurable career targets.
       </p>
-      {mockCareerTargets.map(target => (
-        <div key={target.id} className="p-4 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
-          <div className="mb-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider mb-1"
-              style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
-            >
-              Before
-            </p>
-            <p className="text-xs italic" style={{ color: 'hsl(215, 20%, 65%)' }}>
-              "{target.originalGoal}"
-            </p>
-          </div>
-          <div className="flex items-center gap-2 mb-3">
-            <ArrowRight size={14} style={{ color: 'hsl(200, 83%, 55%)' }} />
-            <p className="text-[10px] font-semibold uppercase tracking-wider"
-              style={{ color: 'hsl(200, 83%, 55%)', fontFamily: 'var(--font-heading)' }}
-            >
-              After — Compressed
-            </p>
-          </div>
-          <p className="text-sm font-semibold" style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}>
-            {target.compressedTarget}
-          </p>
-          <div className="flex items-center gap-2 mt-3">
-            <span className="badge badge-accent">{target.overallClarity}% clarity</span>
-            {target.isActive && <span className="badge badge-success">Active</span>}
-          </div>
+      
+      {targets.length === 0 ? (
+        <div className="p-4 rounded-xl text-center" style={{ background: 'hsl(222, 30%, 12%)' }}>
+          <p className="text-sm" style={{ color: 'hsl(215, 20%, 65%)' }}>No targets defined yet.</p>
         </div>
-      ))}
+      ) : (
+        targets.map(target => (
+          <div key={target.id} className="p-4 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
+            <div className="mb-3">
+              <p className="text-[10px] font-semibold uppercase tracking-wider mb-1"
+                style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+              >
+                Before
+              </p>
+              <p className="text-xs italic" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                "{target.originalGoal}"
+              </p>
+            </div>
+            <div className="flex items-center gap-2 mb-3">
+              <ArrowRight size={14} style={{ color: 'hsl(200, 83%, 55%)' }} />
+              <p className="text-[10px] font-semibold uppercase tracking-wider"
+                style={{ color: 'hsl(200, 83%, 55%)', fontFamily: 'var(--font-heading)' }}
+              >
+                After — Compressed
+              </p>
+            </div>
+            <p className="text-sm font-semibold" style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}>
+              {target.compressedTarget}
+            </p>
+            <div className="flex items-center gap-2 mt-3">
+              <span className="badge badge-accent">{target.overallClarity}% clarity</span>
+              {target.isActive && <span className="badge badge-success">Active</span>}
+            </div>
+          </div>
+        ))
+      )}
     </div>
   );
 }
 
 function TestContent() {
+  const { experiments } = useExperiments();
+  
   return (
     <div className="space-y-4">
       <p className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>
         Career experiments to validate direction through real experience.
       </p>
-      {mockExperiments.map(exp => (
-        <div key={exp.id} className="p-4 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
-          <div className="flex items-center gap-2 mb-2">
-            <span className={`badge ${exp.status === 'completed' ? 'badge-success' : exp.status === 'active' ? 'badge-warning' : 'badge-accent'}`}>
-              {exp.status}
-            </span>
-            <span className="text-[10px]" style={{ color: 'hsl(215, 15%, 45%)' }}>{exp.timeline}</span>
-          </div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider mb-1"
-            style={{ color: 'hsl(45, 93%, 55%)', fontFamily: 'var(--font-heading)' }}
-          >
-            Hypothesis
-          </p>
-          <p className="text-xs font-medium mb-2" style={{ color: 'hsl(210, 40%, 96%)' }}>
-            {exp.hypothesis}
-          </p>
-          <p className="text-[10px] font-semibold uppercase tracking-wider mb-1"
-            style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
-          >
-            Experiment
-          </p>
-          <p className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>
-            {exp.experiment}
-          </p>
-          {exp.scores && (
-            <div className="grid grid-cols-6 gap-2 mt-3 pt-3" style={{ borderTop: '1px solid hsl(222, 25%, 16%)' }}>
-              {[
-                { l: 'Interest', v: exp.scores.interest },
-                { l: 'Enjoyment', v: exp.scores.enjoyment },
-                { l: 'Difficulty', v: exp.scores.difficulty },
-                { l: 'Confidence', v: exp.scores.confidence },
-                { l: 'Performance', v: exp.scores.performance },
-                { l: 'Repeat?', v: exp.scores.wouldRepeat ? 'Yes' : 'No' },
-              ].map(s => (
-                <div key={s.l} className="text-center">
-                  <p className="text-sm font-bold" style={{
-                    color: typeof s.v === 'number'
-                      ? s.v >= 7 ? 'hsl(150, 70%, 45%)' : s.v >= 5 ? 'hsl(45, 93%, 55%)' : 'hsl(0, 72%, 51%)'
-                      : s.v === 'Yes' ? 'hsl(150, 70%, 45%)' : 'hsl(0, 72%, 51%)',
-                    fontFamily: 'var(--font-heading)',
-                  }}>
-                    {s.v}
-                  </p>
-                  <p className="text-[8px]" style={{ color: 'hsl(215, 15%, 45%)' }}>{s.l}</p>
-                </div>
-              ))}
-            </div>
-          )}
+      
+      {experiments.length === 0 ? (
+        <div className="p-4 rounded-xl text-center" style={{ background: 'hsl(222, 30%, 12%)' }}>
+          <p className="text-sm" style={{ color: 'hsl(215, 20%, 65%)' }}>No experiments run yet.</p>
         </div>
-      ))}
+      ) : (
+        experiments.map(exp => (
+          <div key={exp.id} className="p-4 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
+            <div className="flex items-center gap-2 mb-2">
+              <span className={`badge ${exp.status === 'completed' ? 'badge-success' : exp.status === 'active' ? 'badge-warning' : 'badge-accent'}`}>
+                {exp.status}
+              </span>
+              <span className="text-[10px]" style={{ color: 'hsl(215, 15%, 45%)' }}>{exp.timeline}</span>
+            </div>
+            <p className="text-[10px] font-semibold uppercase tracking-wider mb-1"
+              style={{ color: 'hsl(45, 93%, 55%)', fontFamily: 'var(--font-heading)' }}
+            >
+              Hypothesis
+            </p>
+            <p className="text-xs font-medium mb-2" style={{ color: 'hsl(210, 40%, 96%)' }}>
+              {exp.hypothesis}
+            </p>
+            <p className="text-[10px] font-semibold uppercase tracking-wider mb-1"
+              style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+            >
+              Experiment
+            </p>
+            <p className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>
+              {exp.experiment}
+            </p>
+            {exp.scores && (
+              <div className="grid grid-cols-6 gap-2 mt-3 pt-3" style={{ borderTop: '1px solid hsl(222, 25%, 16%)' }}>
+                {[
+                  { l: 'Interest', v: exp.scores.interest },
+                  { l: 'Enjoyment', v: exp.scores.enjoyment },
+                  { l: 'Difficulty', v: exp.scores.difficulty },
+                  { l: 'Confidence', v: exp.scores.confidence },
+                  { l: 'Performance', v: exp.scores.performance },
+                  { l: 'Repeat?', v: exp.scores.wouldRepeat ? 'Yes' : 'No' },
+                ].map(s => (
+                  <div key={s.l} className="text-center">
+                    <p className="text-sm font-bold" style={{
+                      color: typeof s.v === 'number'
+                        ? s.v >= 7 ? 'hsl(150, 70%, 45%)' : s.v >= 5 ? 'hsl(45, 93%, 55%)' : 'hsl(0, 72%, 51%)'
+                        : s.v === 'Yes' ? 'hsl(150, 70%, 45%)' : 'hsl(0, 72%, 51%)',
+                      fontFamily: 'var(--font-heading)',
+                    }}>
+                      {s.v}
+                    </p>
+                    <p className="text-[8px]" style={{ color: 'hsl(215, 15%, 45%)' }}>{s.l}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))
+      )}
     </div>
   );
 }
 
 function OwnContent() {
+  const { skills } = useSkills();
+  const { projects } = useProjects();
+  
   return (
     <div className="space-y-4">
       <p className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>
@@ -376,10 +419,10 @@ function OwnContent() {
           <p className="text-[10px] font-semibold uppercase tracking-wider mb-3"
             style={{ color: 'hsl(150, 70%, 45%)', fontFamily: 'var(--font-heading)' }}
           >
-            Skills ({mockSkills.length})
+            Skills ({skills.length})
           </p>
           <div className="space-y-2">
-            {mockSkills.slice(0, 5).map(skill => (
+            {skills.slice(0, 5).map(skill => (
               <div key={skill.id} className="flex items-center justify-between">
                 <span className="text-xs" style={{ color: 'hsl(210, 40%, 96%)' }}>{skill.skillName}</span>
                 <span className="text-[10px] font-semibold capitalize" style={{ color: 'hsl(215, 20%, 65%)' }}>
@@ -387,23 +430,25 @@ function OwnContent() {
                 </span>
               </div>
             ))}
+            {skills.length === 0 && <p className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>No skills logged.</p>}
           </div>
         </div>
         <div className="p-4 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
           <p className="text-[10px] font-semibold uppercase tracking-wider mb-3"
             style={{ color: 'hsl(150, 70%, 45%)', fontFamily: 'var(--font-heading)' }}
           >
-            Projects ({mockProjects.length})
+            Projects ({projects.length})
           </p>
           <div className="space-y-2">
-            {mockProjects.map(project => (
+            {projects.map(project => (
               <div key={project.id} className="flex items-center justify-between">
                 <span className="text-xs" style={{ color: 'hsl(210, 40%, 96%)' }}>{project.title}</span>
-                <span className={`badge ${project.status === 'completed' ? 'badge-success' : 'badge-warning'}`}>
-                  {project.status.replace('_', ' ')}
+                <span className={`badge badge-success`}>
+                  completed
                 </span>
               </div>
             ))}
+            {projects.length === 0 && <p className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>No projects logged.</p>}
           </div>
         </div>
       </div>
@@ -412,29 +457,38 @@ function OwnContent() {
 }
 
 function RunContent() {
+  const { tasks } = useTasks();
+  
   return (
     <div className="space-y-4">
       <p className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>
         Career execution tasks — every task is connected to a career objective with a clear reason.
       </p>
-      {mockTasks.map(task => (
-        <div key={task.id} className="p-3 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
-          <div className="flex items-center gap-2 mb-1">
-            <span className={`badge ${task.priority === 'high' ? 'badge-error' : task.priority === 'medium' ? 'badge-warning' : 'badge-info'}`}>
-              {task.priority}
-            </span>
-            <span className={`badge ${task.status === 'completed' ? 'badge-success' : task.status === 'in_progress' ? 'badge-warning' : 'badge-accent'}`}>
-              {task.status.replace('_', ' ')}
-            </span>
-          </div>
-          <p className="text-xs font-medium mt-1" style={{ color: 'hsl(210, 40%, 96%)' }}>
-            {task.title}
-          </p>
-          <p className="text-[10px] mt-1 italic" style={{ color: 'hsl(172, 66%, 50%)' }}>
-            Why: {task.reason}
-          </p>
+      
+      {tasks.length === 0 ? (
+        <div className="p-4 rounded-xl text-center" style={{ background: 'hsl(222, 30%, 12%)' }}>
+          <p className="text-sm" style={{ color: 'hsl(215, 20%, 65%)' }}>No tasks assigned.</p>
         </div>
-      ))}
+      ) : (
+        tasks.map(task => (
+          <div key={task.id} className="p-3 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
+            <div className="flex items-center gap-2 mb-1">
+              <span className={`badge ${task.priority === 'high' ? 'badge-error' : task.priority === 'medium' ? 'badge-warning' : 'badge-info'}`}>
+                {task.priority}
+              </span>
+              <span className={`badge ${task.status === 'completed' ? 'badge-success' : task.status === 'in_progress' ? 'badge-warning' : 'badge-accent'}`}>
+                {task.status.replace('_', ' ')}
+              </span>
+            </div>
+            <p className="text-xs font-medium mt-1" style={{ color: 'hsl(210, 40%, 96%)' }}>
+              {task.title}
+            </p>
+            <p className="text-[10px] mt-1 italic" style={{ color: 'hsl(172, 66%, 50%)' }}>
+              Why: {task.reason}
+            </p>
+          </div>
+        ))
+      )}
     </div>
   );
 }

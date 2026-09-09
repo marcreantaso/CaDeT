@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
 import { Crosshair, ArrowUpRight } from 'lucide-react';
-import { mockCareerTargets } from '../../data/mock';
+import { useCareerTargets } from '../../hooks/useCareerTargets';
 
 export function CurrentTarget() {
-  const target = mockCareerTargets.find(t => t.isActive);
+  const { targets } = useCareerTargets();
+  const target = targets.find(t => t.isActive);
   if (!target) return null;
 
   return (

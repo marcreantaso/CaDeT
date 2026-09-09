@@ -6,6 +6,8 @@ import { ACTOR_STAGES, ACTOR_STAGE_META } from '../../types/actor';
 export function ActorProgress() {
   const { actorState } = useActor();
 
+  if (!actorState) return null;
+
   return (
     <motion.div
       className="glass-card p-5"

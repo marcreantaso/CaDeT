@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
-import { mockNextActions } from '../../data/mock';
+import type { NextBestAction as NBA } from '../../types/insights';
 
 export function NextBestAction() {
-  const topAction = mockNextActions[0];
+  const actions: NBA[] = [];
+  const topAction = actions[0];
   if (!topAction) return null;
 
   return (
@@ -51,14 +52,14 @@ export function NextBestAction() {
       </div>
 
       {/* Other actions */}
-      {mockNextActions.length > 1 && (
+      {actions.length > 1 && (
         <div className="mt-4 pt-3 space-y-2 relative z-10" style={{ borderTop: '1px solid hsl(262, 83%, 58%, 0.15)' }}>
           <p className="text-[10px] font-semibold uppercase tracking-wider"
             style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
           >
             Also recommended
           </p>
-          {mockNextActions.slice(1).map((action) => (
+          {actions.slice(1).map((action) => (
             <div key={action.id} className="flex items-start gap-2">
               <ArrowRight size={10} style={{ color: 'hsl(262, 83%, 58%)', marginTop: 3, flexShrink: 0 }} />
               <div>
