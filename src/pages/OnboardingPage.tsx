@@ -1,0 +1,334 @@
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { ArrowRight, ArrowLeft, Target, Rocket, Briefcase, Zap, CheckCircle } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+
+const STEPS = [
+  { id: 0, title: 'Welcome', icon: Rocket },
+  { id: 1, title: 'Current Status', icon: Briefcase },
+  { id: 2, title: 'Top Skills', icon: Zap },
+  { id: 3, title: 'Career Target', icon: Target },
+];
+
+export function OnboardingPage() {
+  const { user, updateProfile } = useAuth();
+  const navigate = useNavigate();
+  const [step, setStep] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Form State
+  const [currentRole, setCurrentRole] = useState('');
+  const [yearsExperience, setYearsExperience] = useState(0);
+  const [skills, setSkills] = useState<string[]>([]);
+  const [newSkill, setNewSkill] = useState('');
+  const [careerTarget, setCareerTarget] = useState('');
+
+  const handleNext = () => setStep(s => Math.min(STEPS.length - 1, s + 1));
+  const handlePrev = () => setStep(s => Math.max(0, s - 1));
+
+  const handleAddSkill = () => {
+    if (newSkill.trim() && !skills.includes(newSkill.trim())) {
+      setSkills([...skills, newSkill.trim()]);
+      setNewSkill('');
+    }
+  };
+
+  const handleComplete = async () => {
+    if (!user) return;
+    setIsSaving(true);
+    
+    try {
+      // 1. Update Profile
+      await updateProfile({
+        current_role: currentRole,
+        years_experience: yearsExperience,
+        onboarding_completed: true,
+        onboarding_step: STEPS.length,
+      });
+
+      // 2. Add Skills
+      for (const skillName of skills) {
+        // Find or create skill in catalog
+        const { data: skillData, error: skillError } = await supabase
+          .from('skills')
+          .select('id')
+          .eq('name', skillName)
+          .single();
+
+        let skillId = skillData?.id;
+
+        if (skillError && skillError.code === 'PGRST116') {
+          // Create new skill in catalog
+          const { data: newSkillData, error: createError } = await supabase
+            .from('skills')
+            .insert([{ name: skillName, category: 'technical' }])
+            .select()
+            .single();
+            
+          if (!createError && newSkillData) {
+            skillId = newSkillData.id;
+          }
+        }
+
+        // Link to user
+        if (skillId) {
+          await supabase.from('user_skills').insert({
+            user_id: user.id,
+            skill_id: skillId,
+            level: 'intermediate',
+            confidence: 50,
+          });
+        }
+      }
+
+      // 3. Add initial Career Target
+      if (careerTarget) {
+        await supabase.from('career_targets').insert({
+          user_id: user.id,
+          original_goal: careerTarget,
+          compressed_target: careerTarget,
+          role_clarity: 50,
+          skill_clarity: 50,
+          industry_clarity: 50,
+          experience_clarity: 50,
+          evidence_clarity: 10,
+          is_active: true,
+        });
+
+        await supabase.from('actor_events').insert({
+          user_id: user.id,
+          stage: 'compress',
+          event_type: 'target_created',
+          title: 'Initial Career Target Set',
+          description: `Targeted: ${careerTarget}`,
+        });
+      }
+
+      navigate('/');
+    } catch (error) {
+      console.error('Failed to complete onboarding:', error);
+      alert('Something went wrong saving your profile.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col md:flex-row" style={{ background: 'hsl(222, 47%, 6%)' }}>
+      {/* Sidebar Progress */}
+      <div className="md:w-64 p-6 md:p-8" style={{ background: 'hsl(222, 47%, 8%)', borderRight: '1px solid hsl(222, 25%, 14%)' }}>
+        <div className="mb-10">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold mb-4"
+            style={{
+              background: 'linear-gradient(135deg, hsl(262, 83%, 58%), hsl(262, 83%, 68%))',
+              fontFamily: 'var(--font-heading)',
+            }}
+          >
+            Cd
+          </div>
+          <h2 className="text-xl font-bold" style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}>
+            Welcome to CaDeT
+          </h2>
+          <p className="text-xs mt-2" style={{ color: 'hsl(215, 20%, 65%)' }}>
+            Let's establish your baseline.
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          {STEPS.map((s, index) => {
+            const Icon = s.icon;
+            const isActive = step === s.id;
+            const isPast = step > s.id;
+            return (
+              <div key={s.id} className="flex items-center gap-3">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${isActive ? 'actor-pulse' : ''}`}
+                  style={{
+                    background: isPast ? 'hsl(150, 70%, 45%, 0.15)' : isActive ? 'hsl(262, 83%, 58%, 0.15)' : 'hsl(222, 25%, 16%)',
+                    color: isPast ? 'hsl(150, 70%, 45%)' : isActive ? 'hsl(262, 83%, 68%)' : 'hsl(215, 15%, 45%)',
+                    border: isActive ? '1px solid hsl(262, 83%, 58%, 0.4)' : '1px solid transparent',
+                  }}
+                >
+                  {isPast ? <CheckCircle size={14} /> : <Icon size={14} />}
+                </div>
+                <span className="text-xs font-medium" style={{ color: isActive ? 'hsl(210, 40%, 96%)' : 'hsl(215, 15%, 45%)' }}>
+                  {s.title}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col justify-center items-center p-6 md:p-12 relative overflow-hidden">
+        {/* Subtle background glow */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl opacity-10 pointer-events-none"
+          style={{ background: 'hsl(262, 83%, 58%)' }}
+        />
+
+        <div className="w-full max-w-xl z-10">
+          <AnimatePresence mode="wait">
+            {step === 0 && (
+              <motion.div
+                key="step0"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="space-y-6"
+              >
+                <h1 className="text-3xl font-bold" style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}>
+                  Hello, {user?.fullName?.split(' ')[0] || 'there'}! 👋
+                </h1>
+                <p className="text-sm leading-relaxed" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                  CaDeT is a career development operating system powered by the ACTOR framework (Aim, Compress, Test, Own, Run). 
+                  To give you the most accurate insights and track your progress correctly, we need to know where you're starting from.
+                </p>
+                <button onClick={handleNext} className="btn btn-primary">
+                  Get Started <ArrowRight size={16} />
+                </button>
+              </motion.div>
+            )}
+
+            {step === 1 && (
+              <motion.div
+                key="step1"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="space-y-6"
+              >
+                <h1 className="text-2xl font-bold" style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}>
+                  Current Status
+                </h1>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                      What is your current or most recent role?
+                    </label>
+                    <input
+                      type="text"
+                      className="input-dark w-full"
+                      placeholder="e.g., Junior Frontend Developer, Student, Unemployed"
+                      value={currentRole}
+                      onChange={e => setCurrentRole(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                      Years of professional experience?
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      className="input-dark w-full md:w-32"
+                      value={yearsExperience}
+                      onChange={e => setYearsExperience(parseInt(e.target.value) || 0)}
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-3 pt-4">
+                  <button onClick={handlePrev} className="btn" style={{ background: 'hsl(222, 25%, 16%)' }}>
+                    <ArrowLeft size={16} /> Back
+                  </button>
+                  <button onClick={handleNext} className="btn btn-primary" disabled={!currentRole}>
+                    Next Step <ArrowRight size={16} />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {step === 2 && (
+              <motion.div
+                key="step2"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="space-y-6"
+              >
+                <h1 className="text-2xl font-bold" style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}>
+                  Top Skills
+                </h1>
+                <p className="text-sm" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                  What are 3-5 skills you are most confident in right now? You can add more later.
+                </p>
+                <div className="space-y-4">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      className="input-dark flex-1"
+                      placeholder="e.g., React, Python, Project Management"
+                      value={newSkill}
+                      onChange={e => setNewSkill(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && handleAddSkill()}
+                    />
+                    <button onClick={handleAddSkill} className="btn" style={{ background: 'hsl(222, 25%, 16%)' }}>
+                      Add
+                    </button>
+                  </div>
+                  
+                  {skills.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-4 p-4 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
+                      {skills.map(skill => (
+                        <div key={skill} className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm" style={{ background: 'hsl(222, 25%, 16%)', color: 'hsl(210, 40%, 96%)' }}>
+                          {skill}
+                          <button onClick={() => setSkills(skills.filter(s => s !== skill))} style={{ color: 'hsl(215, 15%, 45%)' }}>
+                            &times;
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-3 pt-4">
+                  <button onClick={handlePrev} className="btn" style={{ background: 'hsl(222, 25%, 16%)' }}>
+                    <ArrowLeft size={16} /> Back
+                  </button>
+                  <button onClick={handleNext} className="btn btn-primary" disabled={skills.length === 0}>
+                    Next Step <ArrowRight size={16} />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {step === 3 && (
+              <motion.div
+                key="step3"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="space-y-6"
+              >
+                <h1 className="text-2xl font-bold" style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}>
+                  What's the Target?
+                </h1>
+                <p className="text-sm leading-relaxed" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                  In one sentence, what is the next major step you are trying to take in your career? 
+                  (It's okay if it's vague, CaDeT will help you compress it later).
+                </p>
+                <div className="space-y-4">
+                  <textarea
+                    className="input-dark w-full h-32 resize-none"
+                    placeholder="e.g., I want to become a Senior Engineer at a climate tech startup."
+                    value={careerTarget}
+                    onChange={e => setCareerTarget(e.target.value)}
+                  />
+                </div>
+                <div className="flex gap-3 pt-4">
+                  <button onClick={handlePrev} className="btn" style={{ background: 'hsl(222, 25%, 16%)' }} disabled={isSaving}>
+                    <ArrowLeft size={16} /> Back
+                  </button>
+                  <button onClick={handleComplete} className="btn btn-primary" disabled={!careerTarget || isSaving}>
+                    {isSaving ? 'Saving Profile...' : 'Complete & Enter CaDeT'} <ArrowRight size={16} />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
+}
