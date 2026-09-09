@@ -245,7 +245,7 @@ export function InsightsPage() {
                                   </p>
                                 </div>
                                 <ul className="space-y-1">
-                                  {forecast.positiveSignals.map((s, i) => (
+                                  {forecast.positiveSignals.map((s: string, i: number) => (
                                     <li key={i} className="text-[11px]" style={{ color: 'hsl(215, 20%, 65%)' }}>• {s}</li>
                                   ))}
                                 </ul>
@@ -264,7 +264,7 @@ export function InsightsPage() {
                                   </p>
                                 </div>
                                 <ul className="space-y-1">
-                                  {forecast.negativeSignals.map((s, i) => (
+                                  {forecast.negativeSignals.map((s: string, i: number) => (
                                     <li key={i} className="text-[11px]" style={{ color: 'hsl(215, 20%, 65%)' }}>• {s}</li>
                                   ))}
                                 </ul>

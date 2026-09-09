@@ -1,12 +1,5 @@
 // Skills types
 
-export interface Skill {
-  id: string;
-  name: string;
-  category: SkillCategory;
-  description?: string;
-}
-
 export type SkillCategory =
   | 'technical'
   | 'soft'
@@ -15,10 +8,9 @@ export type SkillCategory =
   | 'language'
   | 'framework';
 
-export interface UserSkill {
+export interface Skill {
   id: string;
   userId: string;
-  skillId: string;
   skillName: string;
   category: SkillCategory;
   level: SkillLevel;

@@ -1,11 +1,11 @@
 // Career readiness scoring engine
 
-import type { CareerTarget, Experiment, UserSkill, Project, CareerTask, CareerReadiness } from '../types';
+import type { CareerTarget, Experiment, Skill, Project, CareerTask, CareerReadiness } from '../types';
 
 export function calculateCareerReadiness(
   targets: CareerTarget[],
   experiments: Experiment[],
-  skills: UserSkill[],
+  skills: Skill[],
   projects: Project[],
   tasks: CareerTask[]
 ): CareerReadiness {
@@ -44,14 +44,14 @@ function calculateClarityScore(targets: CareerTarget[]): number {
   return Math.round(avgClarity);
 }
 
-function calculateSkillScore(skills: UserSkill[]): number {
+function calculateSkillScore(skills: Skill[]): number {
   if (skills.length === 0) return 0;
   const avgConfidence = skills.reduce((sum, s) => sum + s.confidence, 0) / skills.length;
   const diversityBonus = Math.min(skills.length * 5, 20);
   return Math.min(Math.round(avgConfidence + diversityBonus), 100);
 }
 
-function calculateEvidenceScore(projects: Project[], skills: UserSkill[]): number {
+function calculateEvidenceScore(projects: Project[], skills: Skill[]): number {
   const completedProjects = projects.filter(p => p.status === 'completed').length;
   const evidenceLinked = skills.filter(s => s.evidenceCount > 0).length;
 

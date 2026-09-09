@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, ArrowLeft, Target, Rocket, Briefcase, Zap, CheckCircle } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+
 
 const STEPS = [
   { id: 0, title: 'Welcome', icon: Rocket },
@@ -49,60 +49,56 @@ export function OnboardingPage() {
       });
 
       // 2. Add Skills
+      const { db } = await import('../lib/db');
+      
       for (const skillName of skills) {
-        // Find or create skill in catalog
-        const { data: skillData, error: skillError } = await supabase
-          .from('skills')
-          .select('id')
-          .eq('name', skillName)
-          .single();
+        // Find existing skill
+        const existingSkill = await db.skills.where('skillName').equals(skillName).filter(s => s.userId === user.id).first();
 
-        let skillId = skillData?.id;
-
-        if (skillError && skillError.code === 'PGRST116') {
-          // Create new skill in catalog
-          const { data: newSkillData, error: createError } = await supabase
-            .from('skills')
-            .insert([{ name: skillName, category: 'technical' }])
-            .select()
-            .single();
-            
-          if (!createError && newSkillData) {
-            skillId = newSkillData.id;
-          }
-        }
-
-        // Link to user
-        if (skillId) {
-          await supabase.from('user_skills').insert({
-            user_id: user.id,
-            skill_id: skillId,
+        if (!existingSkill) {
+          await db.skills.add({
+            id: crypto.randomUUID(),
+            userId: user.id,
+            skillName,
+            category: 'technical',
             level: 'intermediate',
             confidence: 50,
+            evidenceCount: 0,
+            linkedProjects: [],
+            linkedExperiments: [],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
           });
         }
       }
 
       // 3. Add initial Career Target
       if (careerTarget) {
-        await supabase.from('career_targets').insert({
-          user_id: user.id,
-          original_goal: careerTarget,
-          compressed_target: careerTarget,
-          role_clarity: 50,
-          skill_clarity: 50,
-          industry_clarity: 50,
-          experience_clarity: 50,
-          evidence_clarity: 10,
-          is_active: true,
+        await db.career_targets.add({
+          id: crypto.randomUUID(),
+          userId: user.id,
+          originalGoal: careerTarget,
+          compressedTarget: careerTarget,
+          roleClarity: 50,
+          skillClarity: 50,
+          industryClarity: 50,
+          experienceClarity: 50,
+          evidenceClarity: 10,
+          overallClarity: 30,
+          isActive: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         });
 
-        await supabase.from('actor_events').insert({
-          user_id: user.id,
+        await db.actor_events.add({
+          id: crypto.randomUUID(),
+          userId: user.id,
           stage: 'compress',
-          event_type: 'target_created',
+          eventType: 'target_created',
           title: 'Initial Career Target Set',
           description: `Targeted: ${careerTarget}`,
+          metadata: {},
+          createdAt: new Date().toISOString(),
         });
       }
 

@@ -1,8 +1,8 @@
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
-import { supabase } from '../lib/supabase';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { db } from '../lib/db';
 import { useAuth } from './AuthContext';
-import { useRealtimeSubscription } from '../hooks/useRealtimeSubscription';
-import { ACTOR_STAGE_META, type ActorState, type ActorStage, type ActorEvent, type ActorEventType } from '../types/actor';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { ACTOR_STAGE_META, type ActorStage, type ActorState, type ActorEvent } from '../types/actor';
 
 interface ActorContextType {
   actorState: ActorState | null;
@@ -37,145 +37,87 @@ const DEFAULT_STATE: ActorState = {
 
 export function ActorProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  const [actorState, setActorState] = useState<ActorState | null>(null);
-  const [events, setEvents] = useState<ActorEvent[]>([]);
   const [selectedStage, setSelectedStage] = useState<ActorStage | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  
+  // Use useLiveQuery to keep state reactive, but also provide a fallback mechanism if empty
+  const rawActorState = useLiveQuery(
+    () => {
+      if (!user) return undefined;
+      return db.actor_states.where('userId').equals(user.id).first();
+    },
+    [user]
+  );
+  
+  const events = useLiveQuery(
+    () => {
+      if (!user) return [];
+      return db.actor_events.where('userId').equals(user.id).reverse().sortBy('createdAt');
+    },
+    [user],
+    []
+  );
 
-  const fetchActorData = useCallback(async () => {
-    if (!user) {
-      setActorState(null);
-      setEvents([]);
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      // Fetch Actor State
-      const { data: stateData, error: stateError } = await supabase
-        .from('actor_states')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (stateError && stateError.code !== 'PGRST116') throw stateError;
-
-      if (stateData) {
-        setActorState({
-          id: stateData.id,
-          userId: stateData.user_id,
-          currentStage: stateData.current_stage as ActorStage,
-          stages: {
-            aim: { ...ACTOR_STAGE_META.aim, id: 'aim', icon: 'aim', status: stateData.aim_status, progress: stateData.aim_progress },
-            compress: { ...ACTOR_STAGE_META.compress, id: 'compress', icon: 'compress', status: stateData.compress_status, progress: stateData.compress_progress },
-            test: { ...ACTOR_STAGE_META.test, id: 'test', icon: 'test', status: stateData.test_status, progress: stateData.test_progress },
-            own: { ...ACTOR_STAGE_META.own, id: 'own', icon: 'own', status: stateData.own_status, progress: stateData.own_progress },
-            run: { ...ACTOR_STAGE_META.run, id: 'run', icon: 'run', status: stateData.run_status, progress: stateData.run_progress },
-          },
-          cycleCount: stateData.cycle_count,
-          lastTransition: stateData.last_transition,
-          createdAt: stateData.created_at,
-          updatedAt: stateData.updated_at,
-        });
-      } else {
-        setActorState({ ...DEFAULT_STATE, userId: user.id });
-      }
-
-      // Fetch Events
-      const { data: eventData, error: eventError } = await supabase
-        .from('actor_events')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (eventError) throw eventError;
-
-      setEvents(eventData.map(e => ({
-        id: e.id,
-        userId: e.user_id,
-        stage: e.stage as ActorStage,
-        eventType: e.event_type as ActorEventType,
-        title: e.title,
-        description: e.description,
-        metadata: e.metadata,
-        createdAt: e.created_at,
-      })));
-
-    } catch (err) {
-      console.error('Error fetching actor data:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user]);
+  const isLoading = rawActorState === undefined && user !== null;
+  
+  // Create or load default state
+  const actorState = rawActorState || (user ? { ...DEFAULT_STATE, userId: user.id } : null);
 
   useEffect(() => {
-    fetchActorData();
-  }, [fetchActorData]);
-
-  // Listen to changes on actor_states
-  useRealtimeSubscription({
-    table: 'actor_states',
-    onUpdate: () => fetchActorData(),
-    filter: user ? `user_id=eq.${user.id}` : undefined,
-  });
-
-  // Listen to changes on actor_events
-  useRealtimeSubscription({
-    table: 'actor_events',
-    onUpdate: () => fetchActorData(),
-    filter: user ? `user_id=eq.${user.id}` : undefined,
-  });
+    // Automatically seed the actor state if it doesn't exist
+    if (user && rawActorState === undefined && actorState) {
+      db.actor_states.put(actorState);
+    }
+  }, [user, rawActorState, actorState]);
 
   const setActiveStage = async (stage: ActorStage) => {
-    if (!user) return;
+    if (!user || !actorState) return;
 
-    // Optimistic
-    setActorState(prev => prev ? ({
-      ...prev,
+    const updatedState = {
+      ...actorState,
       currentStage: stage,
       stages: {
-        ...prev.stages,
-        [stage]: { ...prev.stages[stage], status: 'active' },
+        ...actorState.stages,
+        [stage]: { ...actorState.stages[stage], status: 'active' },
       },
       lastTransition: new Date().toISOString(),
-    }) : null);
-
-    const updates: any = {
-      current_stage: stage,
-      last_transition: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
-    updates[`${stage}_status`] = 'active';
 
-    await supabase.from('actor_states').update(updates).eq('user_id', user.id);
+    await db.actor_states.put(updatedState);
   };
 
   const completeStage = async (stage: ActorStage) => {
-    if (!user) return;
+    if (!user || !actorState) return;
 
-    const updates: any = {};
-    updates[`${stage}_status`] = 'completed';
-    updates[`${stage}_progress`] = 100;
+    const updatedState = {
+      ...actorState,
+      stages: {
+        ...actorState.stages,
+        [stage]: { ...actorState.stages[stage], status: 'completed', progress: 100 },
+      },
+      updatedAt: new Date().toISOString(),
+    };
 
-    await supabase.from('actor_states').update(updates).eq('user_id', user.id);
+    await db.actor_states.put(updatedState);
   };
 
   const addEvent = async (event: Omit<ActorEvent, 'id' | 'createdAt' | 'userId'>) => {
     if (!user) return;
-    await supabase.from('actor_events').insert({
-      user_id: user.id,
-      stage: event.stage,
-      event_type: event.eventType,
-      title: event.title,
-      description: event.description,
-      metadata: event.metadata || {},
-    });
+    
+    const newEvent: ActorEvent = {
+      ...event,
+      id: crypto.randomUUID(),
+      userId: user.id,
+      createdAt: new Date().toISOString(),
+    };
+    
+    await db.actor_events.add(newEvent);
   };
 
   return (
     <ActorContext.Provider value={{
       actorState,
-      events,
+      events: events || [],
       currentStage: actorState?.currentStage || 'aim',
       isLoading,
       setActiveStage,

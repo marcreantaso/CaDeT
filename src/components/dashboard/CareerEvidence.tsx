@@ -48,7 +48,7 @@ export function CareerEvidence() {
                 </span>
               </div>
               <div className="flex flex-wrap gap-1 mt-1.5">
-                {project.skills.slice(0, 3).map(skill => (
+                {project.skills.slice(0, 3).map((skill: string) => (
                   <span key={skill} className="text-[9px] px-1.5 py-0.5 rounded"
                     style={{ background: 'hsl(222, 25%, 16%)', color: 'hsl(215, 20%, 65%)' }}
                   >

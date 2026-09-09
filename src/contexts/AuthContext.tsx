@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
-import { supabase } from '../lib/supabase';
-import type { Profile, AuthState } from '../types/user';
+import { db } from '../lib/db';
+import type { Profile, AuthState, User } from '../types/user';
+import { useLiveQuery } from 'dexie-react-hooks';
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
@@ -11,158 +12,96 @@ interface AuthContextType extends AuthState {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+const LOCAL_USER_ID = 'local-user-1';
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     profile: null,
-    isLoading: true, // Start in loading state
+    isLoading: true,
     isAuthenticated: false,
   });
 
-  const fetchProfile = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
-
-      if (error && error.code !== 'PGRST116') { // Ignore "Row not found" if brand new
-        console.error('Error fetching profile:', error);
-        return null;
-      }
-      return data;
-    } catch (err) {
-      console.error('Unexpected error fetching profile:', err);
-      return null;
-    }
-  };
-
+  // Automatically setup the local user if they don't exist
   useEffect(() => {
-    // Check active sessions and sets the user
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        const profile = await fetchProfile(session.user.id);
-        setAuthState({
-          user: {
-            id: session.user.id,
-            email: session.user.email!,
-            fullName: profile?.full_name || '',
-            onboardingCompleted: profile?.onboarding_completed || false,
-            createdAt: session.user.created_at,
-            updatedAt: session.user.updated_at || session.user.created_at,
-          },
-          profile,
-          isLoading: false,
-          isAuthenticated: true,
-        });
-      } else {
-        setAuthState({
-          user: null,
-          profile: null,
-          isLoading: false,
-          isAuthenticated: false,
-        });
-      }
-    });
-
-    // Listen for changes on auth state (in, out, etc.)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        const profile = await fetchProfile(session.user.id);
-        setAuthState({
-          user: {
-            id: session.user.id,
-            email: session.user.email!,
-            fullName: profile?.full_name || '',
-            onboardingCompleted: profile?.onboarding_completed || false,
-            createdAt: session.user.created_at,
-            updatedAt: session.user.updated_at || session.user.created_at,
-          },
-          profile,
-          isLoading: false,
-          isAuthenticated: true,
-        });
-      } else {
-        setAuthState({
-          user: null,
-          profile: null,
-          isLoading: false,
-          isAuthenticated: false,
-        });
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const login = useCallback(async (email: string, password: string) => {
-    setAuthState(prev => ({ ...prev, isLoading: true }));
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setAuthState(prev => ({ ...prev, isLoading: false }));
-      throw error;
-    }
-  }, []);
-
-  const signup = useCallback(async (email: string, password: string, fullName: string) => {
-    setAuthState(prev => ({ ...prev, isLoading: true }));
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
+    const initializeLocalUser = async () => {
+      try {
+        let profile = await db.profiles.get(LOCAL_USER_ID);
+        
+        if (!profile) {
+          // Create initial local profile
+          profile = {
+            id: LOCAL_USER_ID,
+            userId: LOCAL_USER_ID,
+            onboardingCompleted: false,
+            onboardingStep: 0,
+            currentRole: '',
+            yearsExperience: 0,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          } as any; // Cast as any if some fields are missing from types
+          
+          await db.profiles.add(profile!);
         }
+
+        const user: User = {
+          id: LOCAL_USER_ID,
+          email: 'local@cadet.app',
+          fullName: 'Local User',
+          onboardingCompleted: profile!.onboardingCompleted,
+          createdAt: profile!.createdAt,
+          updatedAt: profile!.updatedAt,
+        };
+
+        setAuthState({
+          user,
+          profile: profile || null,
+          isLoading: false,
+          isAuthenticated: true,
+        });
+      } catch (error) {
+        console.error('Failed to initialize local user:', error);
+        setAuthState(prev => ({ ...prev, isLoading: false }));
       }
-    });
-    if (error) {
-      setAuthState(prev => ({ ...prev, isLoading: false }));
-      throw error;
+    };
+
+    initializeLocalUser();
+  }, []);
+
+  // Sync profile changes from Dexie automatically
+  useLiveQuery(async () => {
+    if (!authState.isAuthenticated) return;
+    const profile = await db.profiles.get(LOCAL_USER_ID);
+    if (profile) {
+      setAuthState(prev => ({
+        ...prev,
+        profile,
+        user: prev.user ? { ...prev.user, onboardingCompleted: profile.onboardingCompleted } : null
+      }));
     }
+  }, [authState.isAuthenticated]);
+
+  // Dummy implementations for offline mode
+  const login = useCallback(async () => {
+    console.log('Login bypassed in offline mode.');
+  }, []);
+
+  const signup = useCallback(async () => {
+    console.log('Signup bypassed in offline mode.');
   }, []);
 
   const logout = useCallback(async () => {
-    setAuthState(prev => ({ ...prev, isLoading: true }));
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('Logout error:', error);
-    }
+    console.log('Logout bypassed in offline mode.');
   }, []);
 
   const updateProfile = useCallback(async (updates: Partial<Profile>) => {
     if (!authState.user) return;
     
-    // Optimistic update
-    setAuthState(prev => ({
-      ...prev,
-      profile: prev.profile ? { ...prev.profile, ...updates } as any : null,
-      user: prev.user ? {
-        ...prev.user,
-        onboardingCompleted: updates.onboardingCompleted ?? prev.user.onboardingCompleted,
-      } : null,
-    }));
-
-    const dbUpdates: any = { ...updates };
-    if (updates.onboardingCompleted !== undefined) {
-      dbUpdates.onboarding_completed = updates.onboardingCompleted;
-      delete dbUpdates.onboardingCompleted;
-    }
-    if (updates.currentRole !== undefined) {
-      dbUpdates.current_role = updates.currentRole;
-      delete dbUpdates.currentRole;
-    }
-
-    const { error } = await supabase
-      .from('profiles')
-      .update(dbUpdates)
-      .eq('user_id', authState.user.id);
-
-    if (error) {
-      console.error('Failed to update profile:', error);
-      // Rollback would go here if needed, but for now we log it.
-      throw error;
-    }
+    // Update Dexie
+    await db.profiles.update(LOCAL_USER_ID, {
+      ...updates,
+      updatedAt: new Date().toISOString()
+    });
   }, [authState.user]);
 
   return (

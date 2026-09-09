@@ -34,6 +34,7 @@ export type ActorEventType =
   | 'stage_revisited'
   | 'goal_created'
   | 'goal_updated'
+  | 'target_created'
   | 'target_compressed'
   | 'experiment_started'
   | 'experiment_completed'

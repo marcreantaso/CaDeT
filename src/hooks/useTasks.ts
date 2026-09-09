@@ -1,91 +1,65 @@
-import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../lib/supabase';
+import { useState } from 'react';
+import { db } from '../lib/db';
 import { useAuth } from '../contexts/AuthContext';
-import { useRealtimeSubscription } from './useRealtimeSubscription';
+import { useLiveQuery } from 'dexie-react-hooks';
 import type { CareerTask } from '../types/career';
 
 export function useTasks() {
   const { user } = useAuth();
-  const [tasks, setTasks] = useState<CareerTask[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchTasks = useCallback(async () => {
-    if (!user) return;
-    try {
-      setIsLoading(true);
-      const { data, error: fetchError } = await supabase
-        .from('tasks')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+  const tasks = useLiveQuery(
+    () => {
+      if (!user) return [];
+      return db.tasks.where('userId').equals(user.id).reverse().sortBy('createdAt');
+    },
+    [user],
+    []
+  );
 
-      if (fetchError) throw fetchError;
-
-      const mappedTasks: CareerTask[] = data.map((d: any) => ({
-        id: d.id,
-        userId: user.id,
-        title: d.title,
-        reason: d.reason,
-        status: d.status,
-        priority: d.priority,
-        createdAt: d.created_at,
-        updatedAt: d.updated_at,
-        linkedTargetId: d.linked_target_id,
-        period: d.period || 'one_time',
-      }));
-
-      setTasks(mappedTasks);
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    fetchTasks();
-  }, [fetchTasks]);
-
-  useRealtimeSubscription({
-    table: 'tasks',
-    onUpdate: () => fetchTasks(),
-    filter: user ? `user_id=eq.${user.id}` : undefined,
-  });
+  const isLoading = tasks === undefined && user !== null;
 
   const addTask = async (task: Omit<CareerTask, 'id' | 'createdAt' | 'updatedAt' | 'userId'>) => {
     if (!user) return;
-    const { error: insertError } = await supabase.from('tasks').insert({
-      user_id: user.id,
-      title: task.title,
-      reason: task.reason,
-      status: task.status,
-      priority: task.priority,
-      linked_target_id: task.linkedTargetId,
-      period: task.period,
-    });
-    if (insertError) throw insertError;
+    try {
+      const newTask: CareerTask = {
+        ...task,
+        id: crypto.randomUUID(),
+        userId: user.id,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      await db.tasks.add(newTask);
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    }
   };
 
   const updateTask = async (id: string, updates: Partial<CareerTask>) => {
-    const dbUpdates: any = {};
-    if (updates.title !== undefined) dbUpdates.title = updates.title;
-    if (updates.reason !== undefined) dbUpdates.reason = updates.reason;
-    if (updates.status !== undefined) dbUpdates.status = updates.status;
-    if (updates.priority !== undefined) dbUpdates.priority = updates.priority;
-    if (updates.status === 'completed') dbUpdates.completed_at = new Date().toISOString();
-
-    const { error: updateError } = await supabase.from('tasks').update(dbUpdates).eq('id', id);
-    if (updateError) throw updateError;
+    try {
+      await db.tasks.update(id, {
+        ...updates,
+        updatedAt: new Date().toISOString(),
+        ...(updates.status === 'completed' ? { completedAt: new Date().toISOString() } : {})
+      });
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    }
   };
 
   const deleteTask = async (id: string) => {
-    const { error } = await supabase.from('tasks').delete().eq('id', id);
-    if (error) throw error;
+    try {
+      await db.tasks.delete(id);
+    } catch (err) {
+      setError(err as Error);
+      throw err;
+    }
   };
 
   return {
-    tasks,
+    tasks: tasks || [],
     isLoading,
     error,
     addTask,
