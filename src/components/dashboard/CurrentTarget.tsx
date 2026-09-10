@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Crosshair, ArrowUpRight } from 'lucide-react';
 import { useCareerTargets } from '../../hooks/useCareerTargets';
@@ -5,7 +6,12 @@ import { useCareerTargets } from '../../hooks/useCareerTargets';
 export function CurrentTarget() {
   const { targets } = useCareerTargets();
   const target = targets.find(t => t.isActive);
-  if (!target) return null;
+  if (!target) return (
+    <section className="glass-card empty-target">
+      <Crosshair size={22} aria-hidden="true" />
+      <div><h2>Current career target</h2><p>No active target yet. Your target will appear here when one is set.</p></div>
+    </section>
+  );
 
   return (
     <motion.div
@@ -30,7 +36,7 @@ export function CurrentTarget() {
         <div>
           <h3
             className="text-xs font-semibold uppercase tracking-wider"
-            style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+            style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
           >
             Current Career Target
           </h3>
@@ -50,17 +56,18 @@ export function CurrentTarget() {
         >
           {target.overallClarity}% Clarity
         </span>
-        <button
+        <Link
+          to="/journey"
           className="ml-auto flex items-center gap-1 text-xs font-medium transition-colors"
           style={{ color: 'hsl(262, 83%, 68%)' }}
         >
           View details <ArrowUpRight size={12} />
-        </button>
+        </Link>
       </div>
 
       {/* Clarity breakdown */}
       <div className="mt-4 pt-3 relative z-10" style={{ borderTop: '1px solid hsl(222, 25%, 16%)' }}>
-        <div className="grid grid-cols-5 gap-2">
+        <div className="target-metrics">
           {[
             { label: 'Role', value: target.roleClarity },
             { label: 'Skill', value: target.skillClarity },
@@ -74,7 +81,7 @@ export function CurrentTarget() {
               }}>
                 {item.value}
               </p>
-              <p className="text-[9px] mt-0.5" style={{ color: 'hsl(215, 15%, 45%)' }}>
+              <p className="text-xs mt-0.5" style={{ color: 'hsl(var(--text-muted))' }}>
                 {item.label}
               </p>
             </div>

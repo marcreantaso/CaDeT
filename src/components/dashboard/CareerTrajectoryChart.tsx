@@ -57,14 +57,14 @@ export function CareerTrajectoryChart() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.25 }}
     >
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
         <h3
           className="text-xs font-semibold uppercase tracking-wider"
-          style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+          style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
         >
           Career Trajectory
         </h3>
-        <span className="text-[10px]" style={{ color: 'hsl(215, 15%, 45%)' }}>
+        <span className="text-xs" style={{ color: 'hsl(var(--text-muted))' }}>
           Confidence over time
         </span>
       </div>
@@ -74,12 +74,14 @@ export function CareerTrajectoryChart() {
         {directions.map(dir => (
           <div key={dir} className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full" style={{ background: DIRECTION_COLORS[dir] }} />
-            <span className="text-[10px]" style={{ color: 'hsl(215, 20%, 65%)' }}>{dir}</span>
+            <span className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>{dir}</span>
           </div>
         ))}
       </div>
 
-      <div style={{ height: 220 }}>
+      {chartData.length === 0 ? (
+        <div className="chart-empty"><p>No trajectory history yet</p><span>Career confidence trends will appear here when history is available.</span></div>
+      ) : <div className="chart-frame" style={{ height: 220 }}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
             <defs>
@@ -93,12 +95,12 @@ export function CareerTrajectoryChart() {
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 25%, 14%)" />
             <XAxis
               dataKey="date"
-              tick={{ fill: 'hsl(215, 15%, 45%)', fontSize: 10 }}
+              tick={{ fill: 'hsl(var(--text-muted))', fontSize: 10 }}
               axisLine={{ stroke: 'hsl(222, 25%, 14%)' }}
               tickLine={false}
             />
             <YAxis
-              tick={{ fill: 'hsl(215, 15%, 45%)', fontSize: 10 }}
+              tick={{ fill: 'hsl(var(--text-muted))', fontSize: 10 }}
               axisLine={false}
               tickLine={false}
               domain={[0, 100]}
@@ -119,7 +121,7 @@ export function CareerTrajectoryChart() {
             ))}
           </AreaChart>
         </ResponsiveContainer>
-      </div>
+      </div>}
     </motion.div>
   );
 }

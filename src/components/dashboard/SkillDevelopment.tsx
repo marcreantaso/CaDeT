@@ -19,7 +19,7 @@ export function SkillDevelopment() {
       <div className="flex items-center justify-between mb-4">
         <h3
           className="text-xs font-semibold uppercase tracking-wider"
-          style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+          style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
         >
           Skill Development
         </h3>
@@ -42,7 +42,7 @@ export function SkillDevelopment() {
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0"
                 style={{
-                  background: `${levelColor}15`,
+                  background: `color-mix(in srgb, ${levelColor} 8.24%, transparent)`,
                   color: levelColor,
                   fontFamily: 'var(--font-heading)',
                 }}
@@ -58,7 +58,7 @@ export function SkillDevelopment() {
                   >
                     {skill.skillName}
                   </span>
-                  <span className="text-[10px] font-semibold ml-2" style={{ color: levelColor }}>
+                  <span className="text-xs font-semibold ml-2" style={{ color: levelColor }}>
                     {skill.confidence}%
                   </span>
                 </div>
@@ -76,7 +76,7 @@ export function SkillDevelopment() {
               {skill.evidenceCount > 0 && (
                 <div className="flex items-center gap-0.5 flex-shrink-0" title="Evidence count">
                   <TrendingUp size={10} style={{ color: 'hsl(150, 70%, 45%)' }} />
-                  <span className="text-[10px]" style={{ color: 'hsl(150, 70%, 45%)' }}>
+                  <span className="text-xs" style={{ color: 'hsl(150, 70%, 45%)' }}>
                     {skill.evidenceCount}
                   </span>
                 </div>

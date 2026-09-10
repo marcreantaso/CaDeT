@@ -17,7 +17,7 @@ export function SignupPage() {
   };
 
   return (
-    <div className="auth-bg flex items-center justify-center p-4" style={{ minHeight: '100vh' }}>
+    <div className="theme-auth auth-bg flex items-center justify-center p-4" style={{ minHeight: '100vh' }}>
       <motion.div
         className="w-full max-w-md"
         initial={{ opacity: 0, y: 20 }}
@@ -48,13 +48,15 @@ export function SignupPage() {
         </div>
 
         {/* Form */}
-        <div className="auth-card p-8">
+        <div className="auth-card p-5 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(222, 47%, 11%)' }}>
+              <label htmlFor="name" className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(222, 47%, 11%)' }}>
                 Full Name
               </label>
               <input
+                id="name"
+                autoComplete="name"
                 type="text"
                 className="input-light"
                 placeholder="Your full name"
@@ -65,10 +67,12 @@ export function SignupPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(222, 47%, 11%)' }}>
+              <label htmlFor="email" className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(222, 47%, 11%)' }}>
                 Email
               </label>
               <input
+                id="email"
+                autoComplete="email"
                 type="email"
                 className="input-light"
                 placeholder="you@example.com"
@@ -79,10 +83,12 @@ export function SignupPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(222, 47%, 11%)' }}>
+              <label htmlFor="new-password" className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(222, 47%, 11%)' }}>
                 Password
               </label>
               <input
+                id="new-password"
+                autoComplete="new-password"
                 type="password"
                 className="input-light"
                 placeholder="Create a strong password"
@@ -112,7 +118,7 @@ export function SignupPage() {
           </div>
         </div>
 
-        <p className="text-center mt-6 text-xs" style={{ color: 'hsl(215, 16%, 67%)' }}>
+        <p className="text-center mt-6 text-xs" style={{ color: 'hsl(215, 16%, 43%)' }}>
           Career Development Tracker — Powered by the ACTOR Framework
         </p>
       </motion.div>

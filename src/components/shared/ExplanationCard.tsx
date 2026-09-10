@@ -36,8 +36,8 @@ export function ExplanationCard({
 
       {evidence.length > 0 && (
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider mb-1.5"
-            style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+          <p className="text-xs font-semibold uppercase tracking-wider mb-1.5"
+            style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
           >
             Supporting Evidence
           </p>
@@ -54,8 +54,8 @@ export function ExplanationCard({
 
       {actions.length > 0 && (
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-wider mb-1.5"
-            style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+          <p className="text-xs font-semibold uppercase tracking-wider mb-1.5"
+            style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
           >
             Recommended Actions
           </p>

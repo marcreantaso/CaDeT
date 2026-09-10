@@ -18,11 +18,11 @@ export function ActorProgress() {
       <div className="flex items-center justify-between mb-4">
         <h3
           className="text-xs font-semibold uppercase tracking-wider"
-          style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+          style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
         >
           ACTOR Progress
         </h3>
-        <span className="text-[10px] font-medium" style={{ color: 'hsl(215, 15%, 45%)' }}>
+        <span className="text-xs font-medium" style={{ color: 'hsl(var(--text-muted))' }}>
           Cycle {actorState.cycleCount}
         </span>
       </div>
@@ -51,10 +51,10 @@ export function ActorProgress() {
                     background: isCompleted
                       ? meta.color
                       : isActive
-                      ? `${meta.color}25`
+                      ? `color-mix(in srgb, ${meta.color} 14.51%, transparent)`
                       : 'hsl(222, 30%, 14%)',
                     border: isActive ? `2px solid ${meta.color}` : isCompleted ? 'none' : '1px solid hsl(222, 25%, 18%)',
-                    boxShadow: isActive ? `0 0 16px ${meta.color}30` : isCompleted ? `0 0 12px ${meta.color}25` : 'none',
+                    boxShadow: isActive ? `0 0 16px color-mix(in srgb, ${meta.color} 18.82%, transparent)` : isCompleted ? `0 0 12px color-mix(in srgb, ${meta.color} 14.51%, transparent)` : 'none',
                   }}
                 >
                   {isCompleted ? (
@@ -75,7 +75,7 @@ export function ActorProgress() {
                 </div>
 
                 <span
-                  className="text-[10px] font-semibold text-center"
+                  className="text-xs font-semibold text-center"
                   style={{
                     color: isLocked ? 'hsl(215, 15%, 35%)' : isActive ? meta.color : 'hsl(215, 20%, 65%)',
                     fontFamily: 'var(--font-heading)',
@@ -85,7 +85,7 @@ export function ActorProgress() {
                 </span>
 
                 {isActive && (
-                  <span className="text-[9px]" style={{ color: 'hsl(215, 15%, 45%)' }}>
+                  <span className="text-xs" style={{ color: 'hsl(var(--text-muted))' }}>
                     {stage.progress}%
                   </span>
                 )}

@@ -47,7 +47,7 @@ export function ProgressRing({
           style={{
             stroke: scoreColor,
             strokeDasharray: circumference,
-            filter: `drop-shadow(0 0 6px ${scoreColor}40)`,
+            filter: `drop-shadow(0 0 6px color-mix(in srgb, ${scoreColor} 25.1%, transparent))`,
           }}
           initial={{ strokeDashoffset: circumference }}
           animate={{ strokeDashoffset: offset }}
@@ -66,12 +66,12 @@ export function ProgressRing({
           {Math.round(value)}
         </motion.span>
         {label && (
-          <span className="text-[10px] font-medium" style={{ color: 'hsl(215, 20%, 65%)' }}>
+          <span className="text-xs font-medium" style={{ color: 'hsl(215, 20%, 65%)' }}>
             {label}
           </span>
         )}
         {sublabel && (
-          <span className="text-[9px]" style={{ color: 'hsl(215, 15%, 45%)' }}>
+          <span className="text-xs" style={{ color: 'hsl(var(--text-muted))' }}>
             {sublabel}
           </span>
         )}

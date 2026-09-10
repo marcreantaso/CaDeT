@@ -16,15 +16,15 @@ export function CareerEvidence() {
     >
       <h3
         className="text-xs font-semibold uppercase tracking-wider mb-4"
-        style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+        style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
       >
         Career Evidence
       </h3>
 
       {/* Projects */}
       <div className="space-y-2 mb-4">
-        <p className="text-[10px] font-semibold uppercase tracking-wider"
-          style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+        <p className="text-xs font-semibold uppercase tracking-wider"
+          style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
         >
           Projects
         </p>
@@ -49,7 +49,7 @@ export function CareerEvidence() {
               </div>
               <div className="flex flex-wrap gap-1 mt-1.5">
                 {project.skills.slice(0, 3).map((skill: string) => (
-                  <span key={skill} className="text-[9px] px-1.5 py-0.5 rounded"
+                  <span key={skill} className="text-xs px-1.5 py-0.5 rounded"
                     style={{ background: 'hsl(222, 25%, 16%)', color: 'hsl(215, 20%, 65%)' }}
                   >
                     {skill}
@@ -58,7 +58,7 @@ export function CareerEvidence() {
               </div>
             </div>
             {project.evidence && (
-              <ExternalLink size={12} style={{ color: 'hsl(215, 15%, 45%)', flexShrink: 0 }} />
+              <ExternalLink size={12} style={{ color: 'hsl(var(--text-muted))', flexShrink: 0 }} />
             )}
           </motion.div>
         ))}
@@ -66,8 +66,8 @@ export function CareerEvidence() {
 
       {/* Achievements */}
       <div className="space-y-2">
-        <p className="text-[10px] font-semibold uppercase tracking-wider"
-          style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+        <p className="text-xs font-semibold uppercase tracking-wider"
+          style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
         >
           Achievements
         </p>
@@ -82,7 +82,7 @@ export function CareerEvidence() {
               <p className="text-xs font-medium truncate" style={{ color: 'hsl(210, 40%, 96%)' }}>
                 {achievement.title}
               </p>
-              <p className="text-[10px]" style={{ color: 'hsl(215, 15%, 45%)' }}>
+              <p className="text-xs" style={{ color: 'hsl(var(--text-muted))' }}>
                 {new Date(achievement.dateEarned).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </p>
             </div>

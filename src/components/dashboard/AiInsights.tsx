@@ -33,13 +33,13 @@ export function AiInsights() {
       <div className="flex items-center justify-between mb-4">
         <h3
           className="text-xs font-semibold uppercase tracking-wider"
-          style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+          style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
         >
           AI Insights
         </h3>
         <div className="flex items-center gap-1">
           <Brain size={12} style={{ color: 'hsl(262, 83%, 58%)' }} />
-          <span className="text-[10px]" style={{ color: 'hsl(262, 83%, 68%)' }}>
+          <span className="text-xs" style={{ color: 'hsl(262, 83%, 68%)' }}>
             {insights.filter(i => !i.isRead).length} new
           </span>
         </div>
@@ -55,13 +55,13 @@ export function AiInsights() {
               key={insight.id}
               className="p-3 rounded-xl cursor-pointer transition-all"
               style={{
-                background: !insight.isRead ? `${color}08` : 'hsl(222, 30%, 12%)',
-                border: !insight.isRead ? `1px solid ${color}20` : '1px solid transparent',
+                background: !insight.isRead ? `color-mix(in srgb, ${color} 3.14%, transparent)` : 'hsl(222, 30%, 12%)',
+                border: !insight.isRead ? `1px solid color-mix(in srgb, ${color} 12.55%, transparent)` : '1px solid transparent',
               }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.45 + index * 0.06 }}
-              whileHover={{ borderColor: `${color}40` }}
+              whileHover={{ borderColor: `color-mix(in srgb, ${color} 25.1%, transparent)` }}
             >
               <div className="flex items-start gap-2 mb-1.5">
                 <IconComponent size={14} style={{ color, marginTop: 1 }} />
@@ -76,13 +76,13 @@ export function AiInsights() {
                       <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: color }} />
                     )}
                   </div>
-                  <p className="text-[11px] mt-1 mb-2 leading-relaxed" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                  <p className="text-xs mt-1 mb-2 leading-relaxed" style={{ color: 'hsl(215, 20%, 65%)' }}>
                     {insight.description}
                   </p>
                   <ul className="space-y-1">
                     {insight.evidence.map((e: string, i: number) => (
                       <li key={i} className="text-xs flex items-start gap-2" style={{ color: 'hsl(215, 20%, 65%)' }}>
-                        <span className="text-[10px] mt-0.5" style={{ color: INSIGHT_COLORS[insight.type as keyof typeof INSIGHT_COLORS] }}>•</span>
+                        <span className="text-xs mt-0.5" style={{ color: INSIGHT_COLORS[insight.type as keyof typeof INSIGHT_COLORS] }}>•</span>
                         {e}
                       </li>
                     ))}
@@ -91,10 +91,10 @@ export function AiInsights() {
               </div>
 
               <div className="flex items-center justify-between mt-2 pt-2" style={{ borderTop: '1px solid hsl(222, 25%, 16%)' }}>
-                <span className="text-[9px]" style={{ color: 'hsl(215, 15%, 45%)' }}>
+                <span className="text-xs" style={{ color: 'hsl(var(--text-muted))' }}>
                   {insight.confidence}% confidence • {insight.evidence.length} evidence points
                 </span>
-                <ChevronRight size={12} style={{ color: 'hsl(215, 15%, 45%)' }} />
+                <ChevronRight size={12} style={{ color: 'hsl(var(--text-muted))' }} />
               </div>
             </motion.div>
           );

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import type { NextBestAction as NBA } from '../../types/insights';
@@ -5,7 +6,14 @@ import type { NextBestAction as NBA } from '../../types/insights';
 export function NextBestAction() {
   const actions: NBA[] = [];
   const topAction = actions[0];
-  if (!topAction) return null;
+  if (!topAction) return (
+    <section className="focus-card">
+      <span className="eyebrow"><Sparkles size={16} aria-hidden="true" /> Next best action</span>
+      <h2>Make room for your next step.</h2>
+      <p>No recommended action is available yet. Review your ACTOR journey to see your current stage.</p>
+      <Link className="btn btn-primary" to="/journey">View your journey <ArrowRight size={16} aria-hidden="true" /></Link>
+    </section>
+  );
 
   return (
     <motion.div
@@ -32,7 +40,7 @@ export function NextBestAction() {
           <Sparkles size={18} style={{ color: 'hsl(262, 83%, 68%)' }} />
         </div>
         <div className="flex-1">
-          <p className="text-[10px] font-semibold uppercase tracking-wider mb-1"
+          <p className="text-xs font-semibold uppercase tracking-wider mb-1"
             style={{ color: 'hsl(262, 83%, 68%)', fontFamily: 'var(--font-heading)' }}
           >
             Next Best Action
@@ -54,8 +62,8 @@ export function NextBestAction() {
       {/* Other actions */}
       {actions.length > 1 && (
         <div className="mt-4 pt-3 space-y-2 relative z-10" style={{ borderTop: '1px solid hsl(262, 83%, 58%, 0.15)' }}>
-          <p className="text-[10px] font-semibold uppercase tracking-wider"
-            style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+          <p className="text-xs font-semibold uppercase tracking-wider"
+            style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
           >
             Also recommended
           </p>
@@ -66,7 +74,7 @@ export function NextBestAction() {
                 <p className="text-xs font-medium" style={{ color: 'hsl(210, 40%, 96%)' }}>
                   {action.title}
                 </p>
-                <p className="text-[10px] mt-0.5" style={{ color: 'hsl(215, 15%, 45%)' }}>
+                <p className="text-xs mt-0.5" style={{ color: 'hsl(var(--text-muted))' }}>
                   {action.reason.slice(0, 80)}...
                 </p>
               </div>

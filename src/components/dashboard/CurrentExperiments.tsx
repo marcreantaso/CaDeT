@@ -15,7 +15,7 @@ export function CurrentExperiments() {
       <div className="flex items-center justify-between mb-4">
         <h3
           className="text-xs font-semibold uppercase tracking-wider"
-          style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+          style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
         >
           Experiments
         </h3>
@@ -47,13 +47,13 @@ export function CurrentExperiments() {
                 ) : isCompleted ? (
                   <CheckCircle size={14} style={{ color: 'hsl(150, 70%, 45%)', marginTop: 1 }} />
                 ) : (
-                  <FlaskConical size={14} style={{ color: 'hsl(215, 15%, 45%)', marginTop: 1 }} />
+                  <FlaskConical size={14} style={{ color: 'hsl(var(--text-muted))', marginTop: 1 }} />
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium" style={{ color: 'hsl(210, 40%, 96%)' }}>
                     {exp.hypothesis}
                   </p>
-                  <p className="text-[10px] mt-0.5" style={{ color: 'hsl(215, 15%, 45%)' }}>
+                  <p className="text-xs mt-0.5" style={{ color: 'hsl(var(--text-muted))' }}>
                     {exp.timeline} • {exp.status}
                   </p>
                 </div>
@@ -74,7 +74,7 @@ export function CurrentExperiments() {
                       }}>
                         {score.value}
                       </p>
-                      <p className="text-[8px]" style={{ color: 'hsl(215, 15%, 45%)' }}>
+                      <p className="text-xs" style={{ color: 'hsl(var(--text-muted))' }}>
                         {score.label}
                       </p>
                     </div>
