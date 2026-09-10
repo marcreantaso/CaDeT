@@ -50,7 +50,7 @@ export function JourneyPage() {
       <div className="glass-card p-6">
         <h3
           className="text-xs font-semibold uppercase tracking-wider mb-2"
-          style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+          style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
         >
           The ACTOR Loop
         </h3>
@@ -61,7 +61,7 @@ export function JourneyPage() {
         {/* Cycle steps */}
         <div className="flex flex-wrap gap-2">
           {ACTOR_CYCLE.map((step, index) => (
-            <div key={step.label} className="flex items-center gap-2">
+            <div key={step.label} className="flex flex-wrap items-center gap-2">
               <div
                 className="px-3 py-1.5 rounded-lg text-xs font-semibold"
                 style={{
@@ -101,23 +101,27 @@ export function JourneyPage() {
               transition={{ delay: index * 0.08 }}
             >
               {/* Stage card */}
-              <motion.div
-                className="glass-card overflow-hidden cursor-pointer"
+              <motion.button
+                type="button"
+                aria-expanded={isOpen}
+                aria-controls={`stage-panel-${stageId}`}
+                disabled={isLocked}
+                className="glass-card w-full text-left overflow-hidden"
                 style={{
-                  borderColor: isActive ? `${meta.color}40` : undefined,
-                  boxShadow: isActive ? `0 0 20px ${meta.color}15` : undefined,
+                  borderColor: isActive ? `color-mix(in srgb, ${meta.color} 25.1%, transparent)` : undefined,
+                  boxShadow: isActive ? `0 0 20px color-mix(in srgb, ${meta.color} 8.24%, transparent)` : undefined,
                   opacity: isLocked ? 0.5 : 1,
                 }}
                 onClick={() => !isLocked && setOpenStage(isOpen ? null : stageId)}
-                whileHover={isLocked ? {} : { borderColor: `${meta.color}40` }}
+                whileHover={isLocked ? {} : { borderColor: `color-mix(in srgb, ${meta.color} 25.1%, transparent)` }}
               >
-                <div className="p-5 flex items-center gap-4">
+                <div className="p-4 sm:p-5 flex items-center gap-3 sm:gap-4">
                   {/* Stage icon */}
                   <div
                     className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${isActive ? 'actor-pulse' : ''}`}
                     style={{
-                      background: isCompleted ? meta.color : `${meta.color}15`,
-                      boxShadow: isActive ? `0 0 16px ${meta.color}30` : 'none',
+                      background: isCompleted ? meta.color : `color-mix(in srgb, ${meta.color} 8.24%, transparent)`,
+                      boxShadow: isActive ? `0 0 16px color-mix(in srgb, ${meta.color} 18.82%, transparent)` : 'none',
                     }}
                   >
                     {isCompleted ? (
@@ -131,14 +135,14 @@ export function JourneyPage() {
 
                   {/* Stage info */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span
                         className="text-sm font-bold"
                         style={{ color: isLocked ? 'hsl(215, 15%, 40%)' : meta.color, fontFamily: 'var(--font-heading)' }}
                       >
                         {meta.letter}
                       </span>
-                      <span className="text-[10px] font-semibold uppercase tracking-wider"
+                      <span className="text-xs font-semibold uppercase tracking-wider"
                         style={{ color: isLocked ? 'hsl(215, 15%, 40%)' : 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}
                       >
                         {meta.label}
@@ -155,7 +159,7 @@ export function JourneyPage() {
                         <div className="progress-bar" style={{ maxWidth: 200 }}>
                           <div className="progress-bar-fill" style={{ width: `${stage.progress}%`, background: meta.color }} />
                         </div>
-                        <span className="text-[10px] mt-1 inline-block" style={{ color: meta.color }}>
+                        <span className="text-xs mt-1 inline-block" style={{ color: meta.color }}>
                           {stage.progress}% complete
                         </span>
                       </div>
@@ -168,11 +172,11 @@ export function JourneyPage() {
                       animate={{ rotate: isOpen ? 90 : 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <ChevronRight size={18} style={{ color: 'hsl(215, 15%, 45%)' }} />
+                      <ChevronRight size={18} style={{ color: 'hsl(var(--text-muted))' }} />
                     </motion.div>
                   )}
                 </div>
-              </motion.div>
+              </motion.button>
 
               {/* Expanded workflow panel */}
               <AnimatePresence>
@@ -182,6 +186,7 @@ export function JourneyPage() {
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.3 }}
+                    id={`stage-panel-${stageId}`}
                     className="overflow-hidden"
                   >
                     <div
@@ -198,8 +203,8 @@ export function JourneyPage() {
                       {/* Event timeline */}
                       {stageEvents.length > 0 && (
                         <div className="mt-5 pt-4" style={{ borderTop: '1px solid hsl(222, 25%, 14%)' }}>
-                          <p className="text-[10px] font-semibold uppercase tracking-wider mb-3"
-                            style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+                          <p className="text-xs font-semibold uppercase tracking-wider mb-3"
+                            style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
                           >
                             Stage Events
                           </p>
@@ -213,7 +218,7 @@ export function JourneyPage() {
                                   <p className="text-xs font-medium" style={{ color: 'hsl(210, 40%, 96%)' }}>
                                     {event.title}
                                   </p>
-                                  <p className="text-[10px]" style={{ color: 'hsl(215, 15%, 45%)' }}>
+                                  <p className="text-xs" style={{ color: 'hsl(var(--text-muted))' }}>
                                     {formatRelativeDate(event.createdAt)} • {event.description}
                                   </p>
                                 </div>
@@ -269,7 +274,7 @@ function AimContent() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {categories.filter(c => c.items.length > 0).map(cat => (
             <div key={cat.label} className="p-3 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
-              <p className="text-[10px] font-semibold uppercase tracking-wider mb-2"
+              <p className="text-xs font-semibold uppercase tracking-wider mb-2"
                 style={{ color: 'hsl(262, 83%, 68%)', fontFamily: 'var(--font-heading)' }}
               >
                 {cat.label}
@@ -277,7 +282,7 @@ function AimContent() {
               {cat.items.map(goal => (
                 <div key={goal.id} className="mb-2">
                   <p className="text-xs font-medium" style={{ color: 'hsl(210, 40%, 96%)' }}>{goal.title}</p>
-                  <p className="text-[10px] mt-0.5" style={{ color: 'hsl(215, 15%, 45%)' }}>{goal.description}</p>
+                  <p className="text-xs mt-0.5" style={{ color: 'hsl(var(--text-muted))' }}>{goal.description}</p>
                 </div>
               ))}
             </div>
@@ -305,8 +310,8 @@ function CompressContent() {
         targets.map(target => (
           <div key={target.id} className="p-4 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
             <div className="mb-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wider mb-1"
-                style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+              <p className="text-xs font-semibold uppercase tracking-wider mb-1"
+                style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
               >
                 Before
               </p>
@@ -316,7 +321,7 @@ function CompressContent() {
             </div>
             <div className="flex items-center gap-2 mb-3">
               <ArrowRight size={14} style={{ color: 'hsl(200, 83%, 55%)' }} />
-              <p className="text-[10px] font-semibold uppercase tracking-wider"
+              <p className="text-xs font-semibold uppercase tracking-wider"
                 style={{ color: 'hsl(200, 83%, 55%)', fontFamily: 'var(--font-heading)' }}
               >
                 After — Compressed
@@ -356,9 +361,9 @@ function TestContent() {
               <span className={`badge ${exp.status === 'completed' ? 'badge-success' : exp.status === 'active' ? 'badge-warning' : 'badge-accent'}`}>
                 {exp.status}
               </span>
-              <span className="text-[10px]" style={{ color: 'hsl(215, 15%, 45%)' }}>{exp.timeline}</span>
+              <span className="text-xs" style={{ color: 'hsl(var(--text-muted))' }}>{exp.timeline}</span>
             </div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider mb-1"
+            <p className="text-xs font-semibold uppercase tracking-wider mb-1"
               style={{ color: 'hsl(45, 93%, 55%)', fontFamily: 'var(--font-heading)' }}
             >
               Hypothesis
@@ -366,8 +371,8 @@ function TestContent() {
             <p className="text-xs font-medium mb-2" style={{ color: 'hsl(210, 40%, 96%)' }}>
               {exp.hypothesis}
             </p>
-            <p className="text-[10px] font-semibold uppercase tracking-wider mb-1"
-              style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+            <p className="text-xs font-semibold uppercase tracking-wider mb-1"
+              style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
             >
               Experiment
             </p>
@@ -375,7 +380,7 @@ function TestContent() {
               {exp.experiment}
             </p>
             {exp.scores && (
-              <div className="grid grid-cols-6 gap-2 mt-3 pt-3" style={{ borderTop: '1px solid hsl(222, 25%, 16%)' }}>
+              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 mt-3 pt-3" style={{ borderTop: '1px solid hsl(222, 25%, 16%)' }}>
                 {[
                   { l: 'Interest', v: exp.scores.interest },
                   { l: 'Enjoyment', v: exp.scores.enjoyment },
@@ -393,7 +398,7 @@ function TestContent() {
                     }}>
                       {s.v}
                     </p>
-                    <p className="text-[8px]" style={{ color: 'hsl(215, 15%, 45%)' }}>{s.l}</p>
+                    <p className="text-xs" style={{ color: 'hsl(var(--text-muted))' }}>{s.l}</p>
                   </div>
                 ))}
               </div>
@@ -416,7 +421,7 @@ function OwnContent() {
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <div className="p-4 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
-          <p className="text-[10px] font-semibold uppercase tracking-wider mb-3"
+          <p className="text-xs font-semibold uppercase tracking-wider mb-3"
             style={{ color: 'hsl(150, 70%, 45%)', fontFamily: 'var(--font-heading)' }}
           >
             Skills ({skills.length})
@@ -425,7 +430,7 @@ function OwnContent() {
             {skills.slice(0, 5).map(skill => (
               <div key={skill.id} className="flex items-center justify-between">
                 <span className="text-xs" style={{ color: 'hsl(210, 40%, 96%)' }}>{skill.skillName}</span>
-                <span className="text-[10px] font-semibold capitalize" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                <span className="text-xs font-semibold capitalize" style={{ color: 'hsl(215, 20%, 65%)' }}>
                   {skill.level}
                 </span>
               </div>
@@ -434,7 +439,7 @@ function OwnContent() {
           </div>
         </div>
         <div className="p-4 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
-          <p className="text-[10px] font-semibold uppercase tracking-wider mb-3"
+          <p className="text-xs font-semibold uppercase tracking-wider mb-3"
             style={{ color: 'hsl(150, 70%, 45%)', fontFamily: 'var(--font-heading)' }}
           >
             Projects ({projects.length})
@@ -483,7 +488,7 @@ function RunContent() {
             <p className="text-xs font-medium mt-1" style={{ color: 'hsl(210, 40%, 96%)' }}>
               {task.title}
             </p>
-            <p className="text-[10px] mt-1 italic" style={{ color: 'hsl(172, 66%, 50%)' }}>
+            <p className="text-xs mt-1 italic" style={{ color: 'hsl(172, 66%, 50%)' }}>
               Why: {task.reason}
             </p>
           </div>

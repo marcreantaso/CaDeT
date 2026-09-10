@@ -63,7 +63,7 @@ export function InsightsPage() {
           <p className="text-xs font-semibold" style={{ color: 'hsl(45, 93%, 55%)', fontFamily: 'var(--font-heading)' }}>
             These are hypotheses, not predictions
           </p>
-          <p className="text-[11px] mt-0.5" style={{ color: 'hsl(215, 20%, 65%)' }}>
+          <p className="text-xs mt-0.5" style={{ color: 'hsl(215, 20%, 65%)' }}>
             Trajectory forecasts are based on your evidence and behavioral signals. They are recommendations, not guarantees. Confidence reflects data strength, not certainty.
           </p>
         </div>
@@ -73,11 +73,11 @@ export function InsightsPage() {
       <div className="glass-card p-5">
         <h3
           className="text-xs font-semibold uppercase tracking-wider mb-1"
-          style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+          style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
         >
           Career Trajectory Over Time
         </h3>
-        <p className="text-[11px] mb-4" style={{ color: 'hsl(215, 15%, 45%)' }}>
+        <p className="text-xs mb-4" style={{ color: 'hsl(var(--text-muted))' }}>
           How your career direction confidence has evolved based on accumulated evidence
         </p>
 
@@ -86,7 +86,7 @@ export function InsightsPage() {
           {Object.entries(DIRECTION_COLORS).map(([dir, color]) => (
             <div key={dir} className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full" style={{ background: color }} />
-              <span className="text-[11px]" style={{ color: 'hsl(215, 20%, 65%)' }}>{dir}</span>
+              <span className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>{dir}</span>
             </div>
           ))}
         </div>
@@ -103,8 +103,8 @@ export function InsightsPage() {
                 ))}
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 25%, 14%)" />
-              <XAxis dataKey="date" tick={{ fill: 'hsl(215, 15%, 45%)', fontSize: 10 }} axisLine={{ stroke: 'hsl(222, 25%, 14%)' }} tickLine={false} />
-              <YAxis tick={{ fill: 'hsl(215, 15%, 45%)', fontSize: 10 }} axisLine={false} tickLine={false} domain={[0, 100]} tickFormatter={(v: number) => `${v}%`} />
+              <XAxis dataKey="date" tick={{ fill: 'hsl(var(--text-muted))', fontSize: 10 }} axisLine={{ stroke: 'hsl(222, 25%, 14%)' }} tickLine={false} />
+              <YAxis tick={{ fill: 'hsl(var(--text-muted))', fontSize: 10 }} axisLine={false} tickLine={false} domain={[0, 100]} tickFormatter={(v: number) => `${v}%`} />
               <Tooltip
                 contentStyle={{
                   background: 'hsl(222, 35%, 10%)',
@@ -161,14 +161,17 @@ export function InsightsPage() {
                   transition={{ delay: index * 0.06 }}
                 >
                   {/* Header */}
-                  <div
-                    className="p-5 cursor-pointer"
+                  <button
+                    type="button"
+                    aria-expanded={isExpanded}
+                    aria-controls={`forecast-panel-${forecast.id}`}
+                    className="p-4 sm:p-5 w-full text-left"
                     onClick={() => setExpandedForecast(isExpanded ? null : forecast.id)}
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4">
                       <div
                         className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                        style={{ background: `${dirColor}12` }}
+                        style={{ background: `color-mix(in srgb, ${dirColor} 7.06%, transparent)` }}
                       >
                         <Brain size={22} style={{ color: dirColor }} />
                       </div>
@@ -181,7 +184,7 @@ export function InsightsPage() {
                           </p>
                           <TrendIcon size={14} style={{
                             color: forecast.trend === 'rising' ? 'hsl(150, 70%, 45%)' :
-                              forecast.trend === 'declining' ? 'hsl(0, 72%, 51%)' : 'hsl(215, 15%, 45%)'
+                              forecast.trend === 'declining' ? 'hsl(0, 72%, 51%)' : 'hsl(var(--text-muted))'
                           }} />
                         </div>
                         <ConfidenceBadge value={forecast.confidence} />
@@ -204,15 +207,15 @@ export function InsightsPage() {
                         animate={{ rotate: isExpanded ? 180 : 0 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <ChevronDown size={18} style={{ color: 'hsl(215, 15%, 45%)' }} />
+                        <ChevronDown size={18} style={{ color: 'hsl(var(--text-muted))' }} />
                       </motion.div>
                     </div>
-                  </div>
+                  </button>
 
                   {/* Expanded detail */}
                   <AnimatePresence>
                     {isExpanded && (
-                      <motion.div
+                      <motion.div id={`forecast-panel-${forecast.id}`}
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
@@ -238,7 +241,7 @@ export function InsightsPage() {
                               <div className="p-3 rounded-xl" style={{ background: 'hsl(150, 70%, 45%, 0.06)' }}>
                                 <div className="flex items-center gap-1.5 mb-2">
                                   <CheckCircle size={12} style={{ color: 'hsl(150, 70%, 45%)' }} />
-                                  <p className="text-[10px] font-semibold uppercase tracking-wider"
+                                  <p className="text-xs font-semibold uppercase tracking-wider"
                                     style={{ color: 'hsl(150, 70%, 45%)', fontFamily: 'var(--font-heading)' }}
                                   >
                                     Positive Signals
@@ -246,7 +249,7 @@ export function InsightsPage() {
                                 </div>
                                 <ul className="space-y-1">
                                   {forecast.positiveSignals.map((s: string, i: number) => (
-                                    <li key={i} className="text-[11px]" style={{ color: 'hsl(215, 20%, 65%)' }}>• {s}</li>
+                                    <li key={i} className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>• {s}</li>
                                   ))}
                                 </ul>
                               </div>
@@ -257,7 +260,7 @@ export function InsightsPage() {
                               <div className="p-3 rounded-xl" style={{ background: 'hsl(0, 72%, 51%, 0.06)' }}>
                                 <div className="flex items-center gap-1.5 mb-2">
                                   <XCircle size={12} style={{ color: 'hsl(0, 72%, 51%)' }} />
-                                  <p className="text-[10px] font-semibold uppercase tracking-wider"
+                                  <p className="text-xs font-semibold uppercase tracking-wider"
                                     style={{ color: 'hsl(0, 72%, 51%)', fontFamily: 'var(--font-heading)' }}
                                   >
                                     Negative Signals
@@ -265,7 +268,7 @@ export function InsightsPage() {
                                 </div>
                                 <ul className="space-y-1">
                                   {forecast.negativeSignals.map((s: string, i: number) => (
-                                    <li key={i} className="text-[11px]" style={{ color: 'hsl(215, 20%, 65%)' }}>• {s}</li>
+                                    <li key={i} className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>• {s}</li>
                                   ))}
                                 </ul>
                               </div>
@@ -274,14 +277,14 @@ export function InsightsPage() {
                             {/* Behavioral Evidence */}
                             {forecast.behavioralEvidence && forecast.behavioralEvidence.length > 0 && (
                               <div className="p-3 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
-                                <p className="text-[10px] font-semibold uppercase tracking-wider mb-2"
+                                <p className="text-xs font-semibold uppercase tracking-wider mb-2"
                                   style={{ color: 'hsl(262, 83%, 68%)', fontFamily: 'var(--font-heading)' }}
                                 >
                                   Behavioral Evidence
                                 </p>
                                 <ul className="space-y-1">
                                   {forecast.behavioralEvidence.map((s: string, i: number) => (
-                                    <li key={i} className="text-[11px]" style={{ color: 'hsl(215, 20%, 65%)' }}>• {s}</li>
+                                    <li key={i} className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>• {s}</li>
                                   ))}
                                 </ul>
                               </div>
@@ -290,7 +293,7 @@ export function InsightsPage() {
                             {/* Experiment Results */}
                             {forecast.experimentResults && forecast.experimentResults.length > 0 && (
                               <div className="p-3 rounded-xl col-span-1 md:col-span-2" style={{ background: 'hsl(222, 30%, 12%)' }}>
-                                <p className="text-[10px] font-semibold uppercase tracking-wider mb-2"
+                                <p className="text-xs font-semibold uppercase tracking-wider mb-2"
                                   style={{ color: 'hsl(45, 93%, 55%)', fontFamily: 'var(--font-heading)' }}
                                 >
                                   Experiment Results
@@ -298,7 +301,7 @@ export function InsightsPage() {
                                 <ul className="space-y-1">
                                   {forecast.experimentResults.map((s: string, i: number) => (
                                     <li key={i} className="text-xs flex items-start gap-2" style={{ color: 'hsl(215, 20%, 65%)' }}>
-                                      <span className="text-[10px] mt-0.5">•</span>
+                                      <span className="text-xs mt-0.5">•</span>
                                       {s}
                                     </li>
                                   ))}
@@ -311,7 +314,7 @@ export function InsightsPage() {
                               <div className="p-3 rounded-xl" style={{ background: 'hsl(45, 93%, 55%, 0.06)' }}>
                                 <div className="flex items-center gap-1.5 mb-2">
                                   <AlertTriangle size={12} style={{ color: 'hsl(45, 93%, 55%)' }} />
-                                  <p className="text-[10px] font-semibold uppercase tracking-wider"
+                                  <p className="text-xs font-semibold uppercase tracking-wider"
                                     style={{ color: 'hsl(45, 93%, 55%)', fontFamily: 'var(--font-heading)' }}
                                   >
                                     Missing Evidence
@@ -319,7 +322,7 @@ export function InsightsPage() {
                                 </div>
                                 <ul className="space-y-1">
                                   {forecast.missingEvidence.map((s: string, i: number) => (
-                                    <li key={i} className="text-[11px]" style={{ color: 'hsl(215, 20%, 65%)' }}>• {s}</li>
+                                    <li key={i} className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>• {s}</li>
                                   ))}
                                 </ul>
                               </div>
@@ -329,14 +332,14 @@ export function InsightsPage() {
                           {/* Skill Evidence */}
                           {forecast.skillEvidence && forecast.skillEvidence.length > 0 && (
                             <div>
-                              <p className="text-[10px] font-semibold uppercase tracking-wider mb-2"
-                                style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+                              <p className="text-xs font-semibold uppercase tracking-wider mb-2"
+                                style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
                               >
                                 Skill Evidence
                               </p>
                               <div className="flex flex-wrap gap-1.5">
                                 {forecast.skillEvidence.map((s: string, i: number) => (
-                                  <span key={i} className="text-[10px] px-2 py-1 rounded-lg"
+                                  <span key={i} className="text-xs px-2 py-1 rounded-lg"
                                     style={{ background: 'hsl(222, 30%, 14%)', color: 'hsl(215, 20%, 65%)', border: '1px solid hsl(222, 25%, 18%)' }}
                                   >
                                     {s}

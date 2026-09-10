@@ -114,7 +114,7 @@ export function OnboardingPage() {
   return (
     <div className="min-h-screen flex flex-col md:flex-row" style={{ background: 'hsl(222, 47%, 6%)' }}>
       {/* Sidebar Progress */}
-      <div className="md:w-64 p-6 md:p-8" style={{ background: 'hsl(222, 47%, 8%)', borderRight: '1px solid hsl(222, 25%, 14%)' }}>
+      <div className="md:w-64 shrink-0 p-5 md:p-8" style={{ background: 'hsl(222, 47%, 8%)', borderRight: '1px solid hsl(222, 25%, 14%)' }}>
         <div className="mb-10">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold mb-4"
             style={{
@@ -143,13 +143,13 @@ export function OnboardingPage() {
                   className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${isActive ? 'actor-pulse' : ''}`}
                   style={{
                     background: isPast ? 'hsl(150, 70%, 45%, 0.15)' : isActive ? 'hsl(262, 83%, 58%, 0.15)' : 'hsl(222, 25%, 16%)',
-                    color: isPast ? 'hsl(150, 70%, 45%)' : isActive ? 'hsl(262, 83%, 68%)' : 'hsl(215, 15%, 45%)',
+                    color: isPast ? 'hsl(150, 70%, 45%)' : isActive ? 'hsl(262, 83%, 68%)' : 'hsl(var(--text-muted))',
                     border: isActive ? '1px solid hsl(262, 83%, 58%, 0.4)' : '1px solid transparent',
                   }}
                 >
                   {isPast ? <CheckCircle size={14} /> : <Icon size={14} />}
                 </div>
-                <span className="text-xs font-medium" style={{ color: isActive ? 'hsl(210, 40%, 96%)' : 'hsl(215, 15%, 45%)' }}>
+                <span className="text-xs font-medium" style={{ color: isActive ? 'hsl(210, 40%, 96%)' : 'hsl(var(--text-muted))' }}>
                   {s.title}
                 </span>
               </div>
@@ -159,7 +159,7 @@ export function OnboardingPage() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col justify-center items-center p-6 md:p-12 relative overflow-hidden">
+      <div className="flex-1 min-w-0 flex flex-col justify-center items-center p-4 sm:p-6 lg:p-12 relative overflow-hidden">
         {/* Subtle background glow */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl opacity-10 pointer-events-none"
           style={{ background: 'hsl(262, 83%, 58%)' }}
@@ -270,7 +270,7 @@ export function OnboardingPage() {
                       {skills.map(skill => (
                         <div key={skill} className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm" style={{ background: 'hsl(222, 25%, 16%)', color: 'hsl(210, 40%, 96%)' }}>
                           {skill}
-                          <button onClick={() => setSkills(skills.filter(s => s !== skill))} style={{ color: 'hsl(215, 15%, 45%)' }}>
+                          <button onClick={() => setSkills(skills.filter(s => s !== skill))} style={{ color: 'hsl(var(--text-muted))' }}>
                             &times;
                           </button>
                         </div>

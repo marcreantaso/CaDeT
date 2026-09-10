@@ -32,19 +32,19 @@ export function CareerReadinessScore() {
 
   return (
     <motion.div
-      className="glass-card p-5"
+      className="glass-card p-5 readiness-card"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
     >
       <h3
         className="text-xs font-semibold uppercase tracking-wider mb-4"
-        style={{ color: 'hsl(215, 15%, 45%)', fontFamily: 'var(--font-heading)' }}
+        style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
       >
         Career Readiness
       </h3>
 
-      <div className="flex items-center gap-5">
+      <div className="readiness-content">
         <ProgressRing
           value={readiness.overall}
           size={110}
@@ -52,14 +52,14 @@ export function CareerReadinessScore() {
           label="/ 100"
         />
 
-        <div className="flex-1 space-y-2.5">
+        <div className="min-w-0 flex-1 space-y-2.5">
           {components.map((comp) => (
             <div key={comp.label} className="space-y-1">
               <div className="flex justify-between items-center">
-                <span className="text-[11px] font-medium" style={{ color: 'hsl(215, 20%, 65%)', fontFamily: 'var(--font-heading)' }}>
+                <span className="text-xs font-medium" style={{ color: 'hsl(215, 20%, 65%)', fontFamily: 'var(--font-heading)' }}>
                   {comp.label}
                 </span>
-                <span className="text-[11px] font-semibold" style={{ color: comp.color }}>
+                <span className="text-xs font-semibold" style={{ color: comp.color }}>
                   {comp.value}%
                 </span>
               </div>

@@ -80,21 +80,21 @@ export function SkillsPage() {
             Track and develop your career capabilities
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="skills-actions">
           <div className="text-right">
             <p className="text-xl font-bold" style={{ color: 'hsl(172, 66%, 50%)', fontFamily: 'var(--font-heading)' }}>
               {Math.round(totalConfidence)}%
             </p>
-            <p className="text-[10px]" style={{ color: 'hsl(215, 15%, 45%)' }}>Avg. Confidence</p>
+            <p className="text-xs" style={{ color: 'hsl(var(--text-muted))' }}>Avg. Confidence</p>
           </div>
           <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center"
+            className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
             style={{ background: 'hsl(172, 66%, 50%, 0.12)' }}
           >
             <Zap size={20} style={{ color: 'hsl(172, 66%, 50%)' }} />
           </div>
           <button 
-            className="btn btn-primary ml-4"
+            className="btn btn-primary"
             onClick={() => setIsAdding(!isAdding)}
           >
             {isAdding ? 'Cancel' : 'Add Skill'}
@@ -111,8 +111,9 @@ export function SkillsPage() {
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: 'hsl(215, 20%, 65%)' }}>Skill Name</label>
+              <label htmlFor="skill-name" className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(215, 20%, 65%)' }}>Skill Name</label>
               <input 
+                id="skill-name"
                 type="text" 
                 className="input-dark w-full" 
                 value={newSkillName}
@@ -123,8 +124,8 @@ export function SkillsPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: 'hsl(215, 20%, 65%)' }}>Category</label>
-              <select 
+              <label htmlFor="skill-category" className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(215, 20%, 65%)' }}>Category</label>
+              <select id="skill-category"
                 className="input-dark w-full"
                 value={newSkillCategory}
                 onChange={e => setNewSkillCategory(e.target.value as SkillCategory)}
@@ -136,8 +137,8 @@ export function SkillsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: 'hsl(215, 20%, 65%)' }}>Level</label>
-              <select 
+              <label htmlFor="skill-level" className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(215, 20%, 65%)' }}>Level</label>
+              <select id="skill-level"
                 className="input-dark w-full"
                 value={newSkillLevel}
                 onChange={e => setNewSkillLevel(e.target.value as SkillLevel)}
@@ -159,18 +160,19 @@ export function SkillsPage() {
       )}
 
       {/* Search + Filter */}
-      <div className="flex gap-3 flex-wrap">
-        <div className="flex-1 min-w-[200px] relative">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'hsl(215, 15%, 45%)' }} />
+      <div className="skills-filters">
+        <div className="skills-search">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'hsl(var(--text-muted))' }} />
           <input
             type="text"
+            aria-label="Search skills"
             placeholder="Search skills..."
             className="input-dark pl-9"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="flex gap-1.5 flex-wrap">
+        <div className="filter-buttons">
           <button
             className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${filterCategory === 'all' ? '' : ''}`}
             style={{
@@ -179,6 +181,7 @@ export function SkillsPage() {
               border: filterCategory === 'all' ? '1px solid hsl(262, 83%, 58%, 0.3)' : '1px solid hsl(222, 25%, 18%)',
               fontFamily: 'var(--font-heading)',
             }}
+            aria-pressed={filterCategory === 'all'}
             onClick={() => setFilterCategory('all')}
           >
             All
@@ -193,6 +196,7 @@ export function SkillsPage() {
                 border: filterCategory === cat ? '1px solid hsl(262, 83%, 58%, 0.3)' : '1px solid hsl(222, 25%, 18%)',
                 fontFamily: 'var(--font-heading)',
               }}
+              aria-pressed={filterCategory === cat}
               onClick={() => setFilterCategory(cat)}
             >
               {CATEGORY_LABELS[cat]}
@@ -206,9 +210,15 @@ export function SkillsPage() {
           <h3 className="text-xl font-bold mb-2" style={{ color: 'hsl(210, 40%, 96%)' }}>No Skills Yet</h3>
           <p className="text-sm" style={{ color: 'hsl(215, 20%, 65%)' }}>Start building your skill profile by adding your first skill.</p>
         </div>
+      ) : filteredSkills.length === 0 ? (
+        <div className="glass-card p-6 text-center" role="status">
+          <h2 className="text-lg mb-2">No matching skills</h2>
+          <p className="text-sm mb-4" style={{ color: 'hsl(var(--text-secondary))' }}>Try another search or clear your filters.</p>
+          <button type="button" className="btn btn-secondary" onClick={() => { setSearchQuery(''); setFilterCategory('all'); }}>Clear filters</button>
+        </div>
       ) : (
         /* Skills Grid */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="skills-grid">
           {filteredSkills.map((skill, index) => {
             const levelColor = SKILL_LEVEL_COLORS[skill.level as SkillLevel] || SKILL_LEVEL_COLORS.beginner;
 
@@ -220,12 +230,12 @@ export function SkillsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.04 }}
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
+                  <div className="flex min-w-0 items-center gap-3">
                     <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold"
+                      className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold"
                       style={{
-                        background: `${levelColor}12`,
+                        background: `color-mix(in srgb, ${levelColor} 7.06%, transparent)`,
                         color: levelColor,
                         fontFamily: 'var(--font-heading)',
                       }}
@@ -238,7 +248,7 @@ export function SkillsPage() {
                       >
                         {skill.skillName}
                       </p>
-                      <p className="text-[10px] capitalize" style={{ color: 'hsl(215, 15%, 45%)' }}>
+                      <p className="text-xs capitalize" style={{ color: 'hsl(var(--text-muted))' }}>
                         {CATEGORY_LABELS[skill.category]} • {skill.level}
                       </p>
                     </div>
@@ -248,7 +258,7 @@ export function SkillsPage() {
                 {/* Confidence bar */}
                 <div className="mb-3">
                   <div className="flex justify-between mb-1">
-                    <span className="text-[10px]" style={{ color: 'hsl(215, 15%, 45%)' }}>Confidence</span>
+                    <span className="text-xs" style={{ color: 'hsl(var(--text-muted))' }}>Confidence</span>
                     <span className="text-xs font-bold" style={{ color: levelColor }}>{skill.confidence}%</span>
                   </div>
                   <div className="progress-bar">
@@ -266,11 +276,11 @@ export function SkillsPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1">
                     <TrendingUp size={10} style={{ color: 'hsl(150, 70%, 45%)' }} />
-                    <span className="text-[10px]" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                    <span className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>
                       {skill.evidenceCount} evidence
                     </span>
                   </div>
-                  <span className="text-[10px]" style={{ color: 'hsl(215, 15%, 45%)' }}>
+                  <span className="text-xs" style={{ color: 'hsl(var(--text-muted))' }}>
                     {skill.linkedProjects?.length || 0} projects
                   </span>
                 </div>
