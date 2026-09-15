@@ -1,127 +1,185 @@
-import { motion } from 'framer-motion';
+import { useState } from "react";
+import { useLiveQuery } from "dexie-react-hooks";
 import {
-  AreaChart, Area, XAxis, YAxis, Tooltip,
-  ResponsiveContainer, CartesianGrid
-} from 'recharts';
-// Transform trajectory data for Recharts
-const DIRECTION_COLORS: Record<string, string> = {
-  'Full-Stack Development': 'hsl(262, 83%, 58%)',
-  'AI Engineering': 'hsl(172, 66%, 50%)',
-  'Frontend Engineering': 'hsl(200, 83%, 55%)',
-  'Cybersecurity': 'hsl(0, 72%, 51%)',
-  'Data Engineering': 'hsl(45, 93%, 55%)',
-};
-
-const chartData: any[] = [];
-const directions: string[] = [];
-
-interface CustomTooltipProps {
-  active?: boolean;
-  payload?: Array<{ dataKey: string; value: number; color: string }>;
-  label?: string;
-}
-
-function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
-  if (!active || !payload) return null;
-
-  const sorted = [...payload].sort((a, b) => (b.value as number) - (a.value as number));
-
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  Legend,
+} from "recharts";
+import { useAuth } from "../../contexts/AuthContext";
+import { db } from "../../lib/db";
+export function CareerTrajectoryChart({
+  mode = "readiness",
+}: {
+  mode?: "readiness" | "forecast";
+}) {
+  const { user } = useAuth();
+  const [retry, setRetry] = useState(0);
+  const result = useLiveQuery(async () => {
+    if (!user)
+      return {
+        rows: [] as { date: string; values: Record<string, number> }[],
+        error: "",
+      };
+    try {
+      if (mode === "readiness") {
+        const records = await db.progress_history
+          .where("userId")
+          .equals(user.id)
+          .sortBy("date");
+        return {
+          rows: records
+            .slice(-90)
+            .map((row) => ({
+              date: row.date,
+              values: { Readiness: row.overall } as Record<string, number>,
+            })),
+          error: "",
+        };
+      }
+      const records = await db.forecast_history
+        .where("userId")
+        .equals(user.id)
+        .sortBy("date");
+      const grouped = new Map<string, Record<string, number>>();
+      for (const row of records) {
+        const values = grouped.get(row.date) ?? Object.create(null);
+        values[row.direction] = row.confidence;
+        grouped.set(row.date, values);
+      }
+      return {
+        rows: [...grouped]
+          .slice(-90)
+          .map(([date, values]) => ({ date, values })),
+        error: "",
+      };
+    } catch {
+      return { rows: [], error: "Could not load history." };
+    }
+  }, [user?.id, mode, retry]);
+  const directions = [
+    ...new Set(result?.rows.flatMap((row) => Object.keys(row.values)) ?? []),
+  ];
+  const colors = ["#a78bfa", "#2dd4bf", "#38bdf8", "#fbbf24", "#f472b6"];
   return (
-    <div
-      className="rounded-xl p-3 text-xs"
-      style={{
-        background: 'hsl(222, 35%, 10%)',
-        border: '1px solid hsl(222, 25%, 18%)',
-        boxShadow: '0 8px 32px hsl(0, 0%, 0%, 0.4)',
-      }}
-    >
-      <p className="font-semibold mb-2" style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}>
-        {label}
+    <section className="glass-card p-5">
+      <h2 className="text-base mb-2">
+        {mode === "readiness"
+          ? "Readiness history"
+          : "Career direction history"}
+      </h2>
+      <p
+        className="text-sm mb-4"
+        style={{ color: "hsl(var(--text-secondary))" }}
+      >
+        Daily snapshots (UTC), recorded while you use CaDeT. Showing up to 90
+        days.
       </p>
-      {sorted.map((entry) => (
-        <div key={entry.dataKey} className="flex items-center gap-2 py-0.5">
-          <span className="w-2 h-2 rounded-full" style={{ background: entry.color }} />
-          <span style={{ color: 'hsl(215, 20%, 65%)' }}>{entry.dataKey}</span>
-          <span className="ml-auto font-semibold" style={{ color: entry.color }}>{entry.value}%</span>
+      {!result ? (
+        <p role="status">Loading history…</p>
+      ) : result.error ? (
+        <div>
+          <p role="alert">{result.error}</p>
+          <button
+            className="btn btn-secondary"
+            onClick={() => setRetry((n) => n + 1)}
+          >
+            Retry
+          </button>
         </div>
-      ))}
-    </div>
-  );
-}
-
-export function CareerTrajectoryChart() {
-  return (
-    <motion.div
-      className="glass-card p-5"
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.25 }}
-    >
-      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-        <h3
-          className="text-xs font-semibold uppercase tracking-wider"
-          style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
-        >
-          Career Trajectory
-        </h3>
-        <span className="text-xs" style={{ color: 'hsl(var(--text-muted))' }}>
-          Confidence over time
-        </span>
-      </div>
-
-      {/* Legend */}
-      <div className="flex flex-wrap gap-x-4 gap-y-1 mb-3">
-        {directions.map(dir => (
-          <div key={dir} className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full" style={{ background: DIRECTION_COLORS[dir] }} />
-            <span className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>{dir}</span>
+      ) : !result.rows.length ? (
+        <div className="chart-empty">
+          <p>No recorded history yet</p>
+          <span>
+            {mode === "readiness"
+              ? "Your first saved career records establish your baseline."
+              : "Saved career forecasts will appear here. No sample predictions are shown."}
+          </span>
+        </div>
+      ) : (
+        <>
+          {result.rows.length === 1 && (
+            <p className="text-sm mb-3">
+              First snapshot recorded. Return on another day to see a trend.
+            </p>
+          )}
+          <div className="chart-frame" style={{ height: 240 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart
+                data={result.rows}
+                margin={{ left: 0, right: 15, top: 10, bottom: 0 }}
+              >
+                <CartesianGrid
+                  stroke="hsl(var(--border))"
+                  strokeDasharray="3 3"
+                />
+                <XAxis
+                  dataKey="date"
+                  tickFormatter={(value) => value.slice(5)}
+                />
+                <YAxis domain={[0, 100]} width={35} />
+                <Tooltip
+                  contentStyle={{
+                    background: "hsl(var(--bg-secondary))",
+                    borderColor: "hsl(var(--border))",
+                    color: "hsl(var(--text-primary))",
+                  }}
+                />
+                <Legend />
+                {directions.map((direction, index) => (
+                  <Area
+                    key={direction}
+                    name={direction}
+                    dataKey={(row) => row.values[direction]}
+                    stroke={colors[index % colors.length]}
+                    fill={colors[index % colors.length]}
+                    fillOpacity={0.12}
+                    dot
+                    connectNulls={false}
+                    isAnimationActive={false}
+                  />
+                ))}
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
-        ))}
-      </div>
-
-      {chartData.length === 0 ? (
-        <div className="chart-empty"><p>No trajectory history yet</p><span>Career confidence trends will appear here when history is available.</span></div>
-      ) : <div className="chart-frame" style={{ height: 220 }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-            <defs>
-              {directions.map(dir => (
-                <linearGradient key={dir} id={`gradient-${dir.replace(/\s/g, '')}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={DIRECTION_COLORS[dir]} stopOpacity={0.3} />
-                  <stop offset="95%" stopColor={DIRECTION_COLORS[dir]} stopOpacity={0} />
-                </linearGradient>
-              ))}
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 25%, 14%)" />
-            <XAxis
-              dataKey="date"
-              tick={{ fill: 'hsl(var(--text-muted))', fontSize: 10 }}
-              axisLine={{ stroke: 'hsl(222, 25%, 14%)' }}
-              tickLine={false}
-            />
-            <YAxis
-              tick={{ fill: 'hsl(var(--text-muted))', fontSize: 10 }}
-              axisLine={false}
-              tickLine={false}
-              domain={[0, 100]}
-              tickFormatter={(v: number) => `${v}%`}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            {directions.map(dir => (
-              <Area
-                key={dir}
-                type="monotone"
-                dataKey={dir}
-                stroke={DIRECTION_COLORS[dir]}
-                fill={`url(#gradient-${dir.replace(/\s/g, '')})`}
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 4, stroke: DIRECTION_COLORS[dir], strokeWidth: 2, fill: 'hsl(222, 47%, 6%)' }}
-              />
-            ))}
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>}
-    </motion.div>
+          <details className="mt-3 text-sm">
+            <summary className="cursor-pointer">
+              View history as a table
+            </summary>
+            <div className="history-table-wrap">
+              <table>
+                <caption className="sr-only">Saved daily history</caption>
+                <thead>
+                  <tr>
+                    <th>Date (UTC)</th>
+                    {directions.map((d) => (
+                      <th key={d}>{d}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {result.rows.map((row) => (
+                    <tr key={row.date}>
+                      <th>{row.date}</th>
+                      {directions.map((d) => (
+                        <td key={d}>
+                          {row.values[d] === undefined
+                            ? "—"
+                            : `${row.values[d]}%`}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </>
+      )}
+    </section>
   );
 }

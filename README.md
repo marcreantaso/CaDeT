@@ -1,32 +1,35 @@
-# React + TypeScript + Vite
+# CaDeT
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A local-first career development tracker built with React, TypeScript, Vite, and Dexie/IndexedDB.
 
-Currently, two official plugins are available:
+## Run and verify
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```sh
+npm ci
+npm run dev
+npm test
+npm run build
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Career workflow
+
+- Use **Quick add** to save a goal, target, skill, task, project, experiment, achievement, reflection, or work experience.
+- Review saved entries in **Records**. Update skill confidence and levels, change task/project/experiment status, record experiment ratings, and select the active career target.
+- Completed projects with an evidence description or link contribute evidence to skills with matching names (case insensitive). Project status changes update that relationship without double counting.
+- **Next best action** prioritizes overdue unfinished tasks, then task priority and due date. With no pending tasks, it considers goals, an active target, skill gaps, projects, and the ACTOR stage. These are deterministic suggestions, not AI-generated predictions.
+- **Readiness** uses the existing documented scoring rubric. Its explanation shows component weights and distinguishes unrecorded evidence from poor performance.
+- **Readiness history** records the latest score for each UTC day while the workspace is open. Past days are preserved; missing days are not backfilled. **Career direction history** records actual saved forecasts, with no sample trajectories. Forecast generation is not implemented by this change.
+
+## Backup and restore
+
+Open **Records → Backup and restore**. Export the JSON file and keep it outside the browser.
+
+Restore accepts CaDeT version-1 backups up to 5 MB and 10,000 records per collection. A validated preview appears before import. All writes run in one transaction: failure rolls everything back. Missing records are added; existing records are retained unchanged. Imported records belong to the current workspace. Existing active targets take precedence over imported ones.
+
+Backups include career records, insights, forecasts, and history. Profile settings and ACTOR stage settings are excluded. Browser storage is device-local; clearing site data can erase it. There is no cloud synchronization or real sign-in system in the existing offline auth provider.
+
+## Verification
+
+`npm test` exercises IndexedDB with fake-indexeddb: all nine create flows, validation, persistence after reopening, readiness changes, workspace ownership, target activation, backup round trips, duplicate/invalid backup rejection, transactional rollback, task ranking/completion, project evidence linking, experiment ratings, and daily snapshots.
+
+Browser/device QA is still required before release. The implementation environment blocked the local preview through its browser URL policy. Check 320/390 px phones, 768 px tablets, desktop, landscape, 200% zoom, keyboard-only navigation, and dialog focus restoration. The automated tests do not claim to verify rendered layouts.
