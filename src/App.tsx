@@ -1,3 +1,4 @@
+import { BrandLogo } from "./components/shared/BrandLogo";
 import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
@@ -58,20 +59,20 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return (
       <div
         className="flex items-center justify-center min-h-screen"
-        style={{ background: "hsl(222, 47%, 6%)" }}
+        style={{ background: "hsl(var(--bg-primary))" }}
       >
         <div className="text-center">
           <div
             className="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center text-white font-bold actor-pulse"
             style={{
               background:
-                "linear-gradient(135deg, hsl(262, 83%, 58%), hsl(262, 83%, 68%))",
+                "linear-gradient(135deg, hsl(262, 83%, 58%), hsl(var(--accent-light)))",
               fontFamily: "var(--font-heading)",
             }}
           >
-            Cd
+            <BrandLogo />
           </div>
-          <p className="text-sm" style={{ color: "hsl(215, 20%, 65%)" }}>
+          <p className="text-sm" style={{ color: "hsl(var(--text-secondary))" }}>
             Loading...
           </p>
         </div>

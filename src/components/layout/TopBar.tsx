@@ -1,3 +1,5 @@
+import { ThemeToggle } from "../shared/ThemeToggle";
+import { BrandLogo } from "../shared/BrandLogo";
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { ChevronDown, LogOut } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
@@ -13,10 +15,11 @@ export function TopBar() {
   return (
     <header className="top-bar">
       <div className="top-bar-location">
-        <Link to="/" className="top-bar-brand">CaDeT</Link>
+        <Link to="/" className="top-bar-brand"><BrandLogo size={30} />CaDeT</Link>
         <span className="top-bar-divider" aria-hidden="true">/</span>
         <span className="truncate">{page}</span>
       </div>
+      <div className="top-bar-actions"><ThemeToggle />
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
           <button type="button" className="account-trigger" aria-label="Account menu">
@@ -34,7 +37,7 @@ export function TopBar() {
             </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu.Portal>
-      </DropdownMenu.Root>
+      </DropdownMenu.Root></div>
     </header>
   );
 }

@@ -1,3 +1,5 @@
+import { ThemeToggle } from "../components/shared/ThemeToggle";
+import { BrandLogo } from "../components/shared/BrandLogo";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
@@ -22,6 +24,7 @@ export function SignupPage() {
 
   return (
     <div className="theme-auth auth-bg flex items-center justify-center p-4" style={{ minHeight: '100vh' }}>
+      <div className="auth-theme-control"><ThemeToggle /></div>
       <motion.div
         className="w-full max-w-md"
         initial={{ opacity: 0, y: 20 }}
@@ -33,20 +36,20 @@ export function SignupPage() {
           <div
             className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center text-white text-xl font-bold"
             style={{
-              background: 'linear-gradient(135deg, hsl(262, 83%, 58%), hsl(262, 83%, 68%))',
+              background: 'linear-gradient(135deg, hsl(262, 83%, 58%), hsl(var(--accent-light)))',
               fontFamily: 'var(--font-heading)',
               boxShadow: '0 8px 24px hsl(262, 83%, 58%, 0.3)',
             }}
           >
-            Cd
+            <BrandLogo />
           </div>
           <h1
             className="text-2xl font-bold"
-            style={{ color: 'hsl(222, 47%, 11%)', fontFamily: 'var(--font-heading)' }}
+            style={{ color: 'hsl(var(--text-primary))', fontFamily: 'var(--font-heading)' }}
           >
             Start Your Journey
           </h1>
-          <p className="text-sm mt-1" style={{ color: 'hsl(215, 16%, 47%)' }}>
+          <p className="text-sm mt-1" style={{ color: 'hsl(var(--text-secondary))' }}>
             Build the career you can prove.
           </p>
         </div>
@@ -56,7 +59,7 @@ export function SignupPage() {
           <p className="text-sm mb-4">Local device account. Data stays in this browser. Refreshing signs you out. Password recovery and cross-device accounts are not available.</p>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(222, 47%, 11%)' }}>
+              <label htmlFor="name" className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(var(--text-primary))' }}>
                 Full Name
               </label>
               <input
@@ -72,7 +75,7 @@ export function SignupPage() {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(222, 47%, 11%)' }}>
+              <label htmlFor="email" className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(var(--text-primary))' }}>
                 Username
               </label>
               <input
@@ -88,7 +91,7 @@ export function SignupPage() {
             </div>
 
             <div>
-              <label htmlFor="new-password" className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(222, 47%, 11%)' }}>
+              <label htmlFor="new-password" className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(var(--text-primary))' }}>
                 Password
               </label>
               <input
@@ -116,7 +119,7 @@ export function SignupPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm" style={{ color: 'hsl(215, 16%, 47%)' }}>
+            <p className="text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>
               Already have an account?{' '}
               <Link to="/login" className="font-semibold" style={{ color: 'hsl(262, 83%, 58%)' }}>
                 Sign in
@@ -125,7 +128,7 @@ export function SignupPage() {
           </div>
         </div>
 
-        <p className="text-center mt-6 text-xs" style={{ color: 'hsl(215, 16%, 43%)' }}>
+        <p className="text-center mt-6 text-xs" style={{ color: 'hsl(var(--text-muted))' }}>
           Career Development Tracker — Powered by the ACTOR Framework
         </p>
       </motion.div>

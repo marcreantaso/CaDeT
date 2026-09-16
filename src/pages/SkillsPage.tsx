@@ -94,13 +94,13 @@ export function SkillsPage() {
           <h1
             className="text-2xl font-bold"
             style={{
-              color: "hsl(210, 40%, 96%)",
+              color: "hsl(var(--text-primary))",
               fontFamily: "var(--font-heading)",
             }}
           >
             Skills
           </h1>
-          <p className="text-sm mt-1" style={{ color: "hsl(215, 20%, 65%)" }}>
+          <p className="text-sm mt-1" style={{ color: "hsl(var(--text-secondary))" }}>
             Track and develop your career capabilities
           </p>
         </div>
@@ -155,7 +155,7 @@ export function SkillsPage() {
               <label
                 htmlFor="skill-name"
                 className="block text-sm font-medium mb-1.5"
-                style={{ color: "hsl(215, 20%, 65%)" }}
+                style={{ color: "hsl(var(--text-secondary))" }}
               >
                 Skill Name
               </label>
@@ -174,7 +174,7 @@ export function SkillsPage() {
               <label
                 htmlFor="skill-category"
                 className="block text-sm font-medium mb-1.5"
-                style={{ color: "hsl(215, 20%, 65%)" }}
+                style={{ color: "hsl(var(--text-secondary))" }}
               >
                 Category
               </label>
@@ -198,7 +198,7 @@ export function SkillsPage() {
               <label
                 htmlFor="skill-level"
                 className="block text-sm font-medium mb-1.5"
-                style={{ color: "hsl(215, 20%, 65%)" }}
+                style={{ color: "hsl(var(--text-secondary))" }}
               >
                 Level
               </label>
@@ -252,15 +252,15 @@ export function SkillsPage() {
               background:
                 filterCategory === "all"
                   ? "hsl(262, 83%, 58%, 0.15)"
-                  : "hsl(222, 30%, 14%)",
+                  : "hsl(var(--bg-tertiary))",
               color:
                 filterCategory === "all"
-                  ? "hsl(262, 83%, 68%)"
-                  : "hsl(215, 20%, 65%)",
+                  ? "hsl(var(--accent-light))"
+                  : "hsl(var(--text-secondary))",
               border:
                 filterCategory === "all"
                   ? "1px solid hsl(262, 83%, 58%, 0.3)"
-                  : "1px solid hsl(222, 25%, 18%)",
+                  : "1px solid hsl(var(--border-hover))",
               fontFamily: "var(--font-heading)",
             }}
             aria-pressed={filterCategory === "all"}
@@ -276,15 +276,15 @@ export function SkillsPage() {
                 background:
                   filterCategory === cat
                     ? "hsl(262, 83%, 58%, 0.15)"
-                    : "hsl(222, 30%, 14%)",
+                    : "hsl(var(--bg-tertiary))",
                 color:
                   filterCategory === cat
-                    ? "hsl(262, 83%, 68%)"
-                    : "hsl(215, 20%, 65%)",
+                    ? "hsl(var(--accent-light))"
+                    : "hsl(var(--text-secondary))",
                 border:
                   filterCategory === cat
                     ? "1px solid hsl(262, 83%, 58%, 0.3)"
-                    : "1px solid hsl(222, 25%, 18%)",
+                    : "1px solid hsl(var(--border-hover))",
                 fontFamily: "var(--font-heading)",
               }}
               aria-pressed={filterCategory === cat}
@@ -300,11 +300,11 @@ export function SkillsPage() {
         <div className="text-center py-20">
           <h3
             className="text-xl font-bold mb-2"
-            style={{ color: "hsl(210, 40%, 96%)" }}
+            style={{ color: "hsl(var(--text-primary))" }}
           >
             No Skills Yet
           </h3>
-          <p className="text-sm" style={{ color: "hsl(215, 20%, 65%)" }}>
+          <p className="text-sm" style={{ color: "hsl(var(--text-secondary))" }}>
             Start building your skill profile by adding your first skill.
           </p>
         </div>
@@ -360,7 +360,7 @@ export function SkillsPage() {
                       <p
                         className="text-sm font-semibold"
                         style={{
-                          color: "hsl(210, 40%, 96%)",
+                          color: "hsl(var(--text-primary))",
                           fontFamily: "var(--font-heading)",
                         }}
                       >
@@ -412,7 +412,7 @@ export function SkillsPage() {
                     />
                     <span
                       className="text-xs"
-                      style={{ color: "hsl(215, 20%, 65%)" }}
+                      style={{ color: "hsl(var(--text-secondary))" }}
                     >
                       {skill.evidenceCount} evidence
                     </span>

@@ -78,7 +78,7 @@
 }
 
 /* Auth Light Theme */
-.theme-auth {
+:root[data-theme="light"] {
   --bg-primary: 210 40% 98%;
   --bg-secondary: 0 0% 100%;
   --bg-tertiary: 210 20% 96%;
@@ -896,3 +896,19 @@ svg { flex-shrink: 0; }
   .career-detail-grid { grid-template-columns: minmax(0, 1.25fr) minmax(20rem, .75fr); }
   .simulation-panel { position: sticky; top: 6.5rem; }
 }
+
+/* Shared appearance for every route and portal. */
+:root { color-scheme: dark; }
+:root[data-theme="light"] { color-scheme: light; --bg-primary: 225 35% 97%; --bg-secondary: 0 0% 100%; --bg-tertiary: 225 30% 94%; --bg-elevated: 225 25% 90%; --text-primary: 222 47% 11%; --text-secondary: 215 22% 34%; --text-muted: 215 18% 40%; --accent-light: 262 75% 43%; --teal: 172 80% 27%; --success: 150 75% 28%; --warning: 38 90% 30%; --info: 205 80% 34%; }
+.cadet-logo { display: block; flex-shrink: 0; border-radius: 28%; }
+.top-bar-brand, .top-bar-actions { display: flex; align-items: center; gap: .65rem; }
+.top-bar-actions { flex-shrink: 0; }
+.theme-toggle { padding: .5rem .7rem; gap: .4rem; font-size: .8rem; }
+.auth-theme-control { position: absolute; right: 1rem; top: 1rem; }
+.auth-bg { position: relative; padding-top: 5rem; color-scheme: inherit; background: radial-gradient(ellipse at top, hsl(var(--accent) / .09), transparent 65%), hsl(var(--bg-primary)); }
+.auth-card, .input-light { background: hsl(var(--bg-secondary)); color: hsl(var(--text-primary)); border-color: hsl(var(--border)); }
+.input-light::placeholder { color: hsl(var(--text-muted)); }
+.app-sidebar { background: hsl(var(--bg-secondary)); }
+:root[data-theme="light"] .form-error { color: #991b1b; }
+:root[data-theme="light"] .form-success { color: #166534; }
+@media (max-width: 30rem) { .theme-toggle span { display: none; } .top-bar-location { min-width: 0; } }

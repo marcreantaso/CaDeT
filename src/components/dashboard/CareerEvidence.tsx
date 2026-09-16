@@ -55,7 +55,7 @@ export function CareerEvidence() {
           <motion.div
             key={project.id}
             className="flex items-start gap-3 p-3 rounded-lg"
-            style={{ background: "hsl(222, 30%, 12%)" }}
+            style={{ background: "hsl(var(--bg-secondary))" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 + index * 0.05 }}
@@ -68,7 +68,7 @@ export function CareerEvidence() {
               <div className="flex items-center gap-2">
                 <p
                   className="text-xs font-medium truncate"
-                  style={{ color: "hsl(210, 40%, 96%)" }}
+                  style={{ color: "hsl(var(--text-primary))" }}
                 >
                   {project.title}
                 </p>
@@ -84,8 +84,8 @@ export function CareerEvidence() {
                     key={skill}
                     className="text-xs px-1.5 py-0.5 rounded"
                     style={{
-                      background: "hsl(222, 25%, 16%)",
-                      color: "hsl(215, 20%, 65%)",
+                      background: "hsl(var(--border))",
+                      color: "hsl(var(--text-secondary))",
                     }}
                   >
                     {skill}
@@ -118,13 +118,13 @@ export function CareerEvidence() {
           <div
             key={achievement.id}
             className="flex items-center gap-3 p-3 rounded-lg"
-            style={{ background: "hsl(222, 30%, 12%)" }}
+            style={{ background: "hsl(var(--bg-secondary))" }}
           >
             <Trophy size={14} style={{ color: "hsl(150, 70%, 45%)" }} />
             <div className="flex-1 min-w-0">
               <p
                 className="text-xs font-medium truncate"
-                style={{ color: "hsl(210, 40%, 96%)" }}
+                style={{ color: "hsl(var(--text-primary))" }}
               >
                 {achievement.title}
               </p>

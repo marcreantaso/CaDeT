@@ -1,3 +1,4 @@
+import { BrandLogo } from "../shared/BrandLogo";
 import { NavLink, Link } from 'react-router-dom';
 import { Plus, LogOut } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -14,7 +15,7 @@ export function Sidebar({ onQuickAdd }: { onQuickAdd: () => void }) {
   return (
     <aside className="app-sidebar">
       <Link to="/" className="brand" aria-label="CaDeT dashboard">
-        <span className="brand-mark" aria-hidden="true">Cd</span>
+        <span className="brand-mark" aria-hidden="true"><BrandLogo /></span>
         <span className="sidebar-copy"><strong>CaDeT</strong><small>Career tracker</small></span>
       </Link>
       <div className="sidebar-section-label sidebar-copy">Workspace</div>

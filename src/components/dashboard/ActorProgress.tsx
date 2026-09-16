@@ -52,15 +52,15 @@ export function ActorProgress() {
                       ? meta.color
                       : isActive
                       ? `color-mix(in srgb, ${meta.color} 14.51%, transparent)`
-                      : 'hsl(222, 30%, 14%)',
-                    border: isActive ? `2px solid ${meta.color}` : isCompleted ? 'none' : '1px solid hsl(222, 25%, 18%)',
+                      : 'hsl(var(--bg-tertiary))',
+                    border: isActive ? `2px solid ${meta.color}` : isCompleted ? 'none' : '1px solid hsl(var(--border-hover))',
                     boxShadow: isActive ? `0 0 16px color-mix(in srgb, ${meta.color} 18.82%, transparent)` : isCompleted ? `0 0 12px color-mix(in srgb, ${meta.color} 14.51%, transparent)` : 'none',
                   }}
                 >
                   {isCompleted ? (
                     <Check size={18} style={{ color: 'white' }} strokeWidth={2.5} />
                   ) : isLocked ? (
-                    <Lock size={14} style={{ color: 'hsl(215, 15%, 40%)' }} />
+                    <Lock size={14} style={{ color: 'hsl(var(--text-muted))' }} />
                   ) : (
                     <span
                       className="text-sm font-bold"
@@ -77,7 +77,7 @@ export function ActorProgress() {
                 <span
                   className="text-xs font-semibold text-center"
                   style={{
-                    color: isLocked ? 'hsl(215, 15%, 35%)' : isActive ? meta.color : 'hsl(215, 20%, 65%)',
+                    color: isLocked ? 'hsl(var(--text-muted))' : isActive ? meta.color : 'hsl(var(--text-secondary))',
                     fontFamily: 'var(--font-heading)',
                   }}
                 >
@@ -112,13 +112,13 @@ export function ActorProgress() {
       {/* Current stage detail */}
       <div
         className="mt-3 pt-3 flex items-center gap-2"
-        style={{ borderTop: '1px solid hsl(222, 25%, 16%)' }}
+        style={{ borderTop: '1px solid hsl(var(--border))' }}
       >
         <div
           className="w-2 h-2 rounded-full actor-pulse"
           style={{ background: ACTOR_STAGE_META[actorState.currentStage].color }}
         />
-        <span className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>
+        <span className="text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>
           Currently in{' '}
           <span className="font-semibold" style={{ color: ACTOR_STAGE_META[actorState.currentStage].color }}>
             {ACTOR_STAGE_META[actorState.currentStage].label}
