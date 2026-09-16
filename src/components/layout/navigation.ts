@@ -1,4 +1,4 @@
-import { Home, Route, Zap, Brain, FolderKanban } from "lucide-react";
+import { Home, Route, Zap, Brain, FolderKanban, GitBranch } from "lucide-react";
 
 export const navigationItems = [
   { path: "/", icon: Home, label: "Dashboard", shortLabel: "Home" },
@@ -7,6 +7,12 @@ export const navigationItems = [
     icon: Route,
     label: "ACTOR Journey",
     shortLabel: "Journey",
+  },
+  {
+    path: "/career-map",
+    icon: GitBranch,
+    label: "Career Map",
+    shortLabel: "Map",
   },
   { path: "/skills", icon: Zap, label: "Skills", shortLabel: "Skills" },
   {
