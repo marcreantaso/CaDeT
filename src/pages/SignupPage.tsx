@@ -8,12 +8,16 @@ export function SignupPage() {
   const navigate = useNavigate();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [claimLegacy, setClaimLegacy] = useState(false);
   const [password, setPassword] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await signup(email, password, fullName);
-    navigate('/');
+    if (busy) return;
+    setBusy(true); setError('');
+    try { await signup(email, password, fullName, claimLegacy); navigate('/'); } catch (err) { setError(err instanceof Error ? err.message : 'Please try again.'); } finally { setBusy(false); }
   };
 
   return (
@@ -49,6 +53,7 @@ export function SignupPage() {
 
         {/* Form */}
         <div className="auth-card p-5 sm:p-8">
+          <p className="text-sm mb-4">Local device account. Data stays in this browser. Refreshing signs you out. Password recovery and cross-device accounts are not available.</p>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label htmlFor="name" className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(222, 47%, 11%)' }}>
@@ -68,14 +73,14 @@ export function SignupPage() {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(222, 47%, 11%)' }}>
-                Email
+                Username
               </label>
               <input
                 id="email"
-                autoComplete="email"
-                type="email"
+                autoComplete="username"
+                type="text"
                 className="input-light"
-                placeholder="you@example.com"
+                placeholder="your_username"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
@@ -95,16 +100,18 @@ export function SignupPage() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
-                minLength={8}
+                minLength={12}
               />
             </div>
 
+            <label className="flex gap-2 text-sm"><input type="checkbox" checked={claimLegacy} onChange={e => setClaimLegacy(e.target.checked)} />Use the previous unprotected workspace on this device. Only select this if it belongs to you.</label>
+            {error && <p role="alert">{error}</p>}
             <button
               type="submit"
               className="btn-auth"
-              disabled={isLoading}
+              disabled={isLoading || busy}
             >
-              {isLoading ? 'Creating account...' : 'Create Account'}
+              {busy ? 'Creating account...' : 'Create Account'}
             </button>
           </form>
 

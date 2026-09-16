@@ -14,6 +14,7 @@ import type { Achievement, Reflection } from "../types/career";
 import type { ActorState, ActorEvent } from "../types/actor";
 
 export class CadetDatabase extends Dexie {
+  accounts!: Table<import("./localAuth").LocalAccount, string>;
   profiles!: Table<Profile, string>;
   skills!: Table<Skill, string>;
   tasks!: Table<CareerTask, string>;
@@ -85,6 +86,7 @@ export class CadetDatabase extends Dexie {
       actor_states: "id, userId",
       actor_events: "id, userId, stage, eventType",
     });
+    this.version(5).stores({ accounts: "id, &username" });
     this.version(4).stores({
       achievements: "id, userId, dateEarned",
       reflections: "id, userId, createdAt",

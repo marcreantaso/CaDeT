@@ -48,6 +48,8 @@ const CareerMapPage = lazy(() =>
   })),
 );
 
+const DeveloperPage = lazy(() => import("./pages/DeveloperPage").then(m => ({ default: m.DeveloperPage })));
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
@@ -139,7 +141,7 @@ function AppRoutes() {
           path="/"
           element={
             <ProtectedRoute>
-              <ActorProvider>
+              <ActorProvider key="authenticated-workspace">
                 <AppShell />
               </ActorProvider>
             </ProtectedRoute>
@@ -148,6 +150,7 @@ function AppRoutes() {
           <Route index element={<DashboardPage />} />
           <Route path="journey" element={<JourneyPage />} />
           <Route path="records" element={<RecordsPage />} />
+          <Route path="developer" element={<DeveloperPage />} />
           <Route path="career-map" element={<CareerMapPage />} />
           <Route path="skills" element={<SkillsPage />} />
           <Route path="insights" element={<InsightsPage />} />
