@@ -55,7 +55,7 @@ export function CurrentTarget() {
       <p
         className="text-sm font-semibold leading-relaxed mb-3 relative z-10"
         style={{
-          color: "hsl(210, 40%, 96%)",
+          color: "hsl(var(--text-primary))",
           fontFamily: "var(--font-heading)",
         }}
       >
@@ -69,7 +69,7 @@ export function CurrentTarget() {
         <Link
           to="/records?kind=target"
           className="ml-auto flex items-center gap-1 text-xs font-medium transition-colors"
-          style={{ color: "hsl(262, 83%, 68%)" }}
+          style={{ color: "hsl(var(--accent-light))" }}
         >
           View details <ArrowUpRight size={12} />
         </Link>
@@ -78,7 +78,7 @@ export function CurrentTarget() {
       {/* Clarity breakdown */}
       <div
         className="mt-4 pt-3 relative z-10"
-        style={{ borderTop: "1px solid hsl(222, 25%, 16%)" }}
+        style={{ borderTop: "1px solid hsl(var(--border))" }}
       >
         <div className="target-metrics">
           {[

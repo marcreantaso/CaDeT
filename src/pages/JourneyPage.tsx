@@ -37,11 +37,11 @@ export function JourneyPage() {
       <div>
         <h1
           className="text-2xl font-bold"
-          style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}
+          style={{ color: 'hsl(var(--text-primary))', fontFamily: 'var(--font-heading)' }}
         >
           ACTOR Journey
         </h1>
-        <p className="text-sm mt-1" style={{ color: 'hsl(215, 20%, 65%)' }}>
+        <p className="text-sm mt-1" style={{ color: 'hsl(var(--text-secondary))' }}>
           Your continuous career development workflow — Cycle {actorState.cycleCount}
         </p>
       </div>
@@ -54,7 +54,7 @@ export function JourneyPage() {
         >
           The ACTOR Loop
         </h3>
-        <p className="text-xs mb-5" style={{ color: 'hsl(215, 20%, 65%)' }}>
+        <p className="text-xs mb-5" style={{ color: 'hsl(var(--text-secondary))' }}>
           AIM → COMPRESS → TEST → OWN → RUN → Observe → Learn → Recalculate → AIM
         </p>
 
@@ -66,15 +66,15 @@ export function JourneyPage() {
                 className="px-3 py-1.5 rounded-lg text-xs font-semibold"
                 style={{
                   fontFamily: 'var(--font-heading)',
-                  background: step.isActor ? 'hsl(262, 83%, 58%, 0.12)' : 'hsl(222, 30%, 14%)',
-                  color: step.isActor ? 'hsl(262, 83%, 68%)' : 'hsl(215, 20%, 65%)',
-                  border: step.isActor ? '1px solid hsl(262, 83%, 58%, 0.2)' : '1px solid hsl(222, 25%, 18%)',
+                  background: step.isActor ? 'hsl(262, 83%, 58%, 0.12)' : 'hsl(var(--bg-tertiary))',
+                  color: step.isActor ? 'hsl(var(--accent-light))' : 'hsl(var(--text-secondary))',
+                  border: step.isActor ? '1px solid hsl(262, 83%, 58%, 0.2)' : '1px solid hsl(var(--border-hover))',
                 }}
               >
                 {step.label}
               </div>
               {index < ACTOR_CYCLE.length - 1 && (
-                <ArrowRight size={12} style={{ color: 'hsl(215, 15%, 35%)' }} />
+                <ArrowRight size={12} style={{ color: 'hsl(var(--text-muted))' }} />
               )}
             </div>
           ))}
@@ -127,7 +127,7 @@ export function JourneyPage() {
                     {isCompleted ? (
                       <Check size={22} style={{ color: 'white' }} strokeWidth={2.5} />
                     ) : isLocked ? (
-                      <Lock size={18} style={{ color: 'hsl(215, 15%, 35%)' }} />
+                      <Lock size={18} style={{ color: 'hsl(var(--text-muted))' }} />
                     ) : (
                       <StageIcon size={22} style={{ color: meta.color }} />
                     )}
@@ -138,12 +138,12 @@ export function JourneyPage() {
                     <div className="flex flex-wrap items-center gap-2">
                       <span
                         className="text-sm font-bold"
-                        style={{ color: isLocked ? 'hsl(215, 15%, 40%)' : meta.color, fontFamily: 'var(--font-heading)' }}
+                        style={{ color: isLocked ? 'hsl(var(--text-muted))' : meta.color, fontFamily: 'var(--font-heading)' }}
                       >
                         {meta.letter}
                       </span>
                       <span className="text-xs font-semibold uppercase tracking-wider"
-                        style={{ color: isLocked ? 'hsl(215, 15%, 40%)' : 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}
+                        style={{ color: isLocked ? 'hsl(var(--text-muted))' : 'hsl(var(--text-primary))', fontFamily: 'var(--font-heading)' }}
                       >
                         {meta.label}
                       </span>
@@ -151,7 +151,7 @@ export function JourneyPage() {
                         {stage.status}
                       </span>
                     </div>
-                    <p className="text-xs mt-1" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                    <p className="text-xs mt-1" style={{ color: 'hsl(var(--text-secondary))' }}>
                       {meta.description}
                     </p>
                     {isActive && (
@@ -191,7 +191,7 @@ export function JourneyPage() {
                   >
                     <div
                       className="p-5 mt-1 rounded-2xl"
-                      style={{ background: 'hsl(222, 30%, 9%)', border: '1px solid hsl(222, 25%, 14%)' }}
+                      style={{ background: 'hsl(var(--bg-secondary))', border: '1px solid hsl(var(--border))' }}
                     >
                       {/* Stage-specific content */}
                       {stageId === 'aim' && <AimContent />}
@@ -202,7 +202,7 @@ export function JourneyPage() {
 
                       {/* Event timeline */}
                       {stageEvents.length > 0 && (
-                        <div className="mt-5 pt-4" style={{ borderTop: '1px solid hsl(222, 25%, 14%)' }}>
+                        <div className="mt-5 pt-4" style={{ borderTop: '1px solid hsl(var(--border))' }}>
                           <p className="text-xs font-semibold uppercase tracking-wider mb-3"
                             style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
                           >
@@ -215,7 +215,7 @@ export function JourneyPage() {
                                   style={{ background: meta.color }}
                                 />
                                 <div>
-                                  <p className="text-xs font-medium" style={{ color: 'hsl(210, 40%, 96%)' }}>
+                                  <p className="text-xs font-medium" style={{ color: 'hsl(var(--text-primary))' }}>
                                     {event.title}
                                   </p>
                                   <p className="text-xs" style={{ color: 'hsl(var(--text-muted))' }}>
@@ -235,7 +235,7 @@ export function JourneyPage() {
               {/* Connector between stages */}
               {index < ACTOR_STAGES.length - 1 && (
                 <div className="flex justify-center py-1">
-                  <div className="w-0.5 h-4 rounded-full" style={{ background: 'hsl(222, 25%, 18%)' }} />
+                  <div className="w-0.5 h-4 rounded-full" style={{ background: 'hsl(var(--border-hover))' }} />
                 </div>
               )}
             </motion.div>
@@ -262,26 +262,26 @@ function AimContent() {
 
   return (
     <div className="space-y-4">
-      <p className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>
+      <p className="text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>
         Career ambitions, interests, values, and preferences collected during the AIM stage.
       </p>
       
       {goals.length === 0 ? (
-        <div className="p-4 rounded-xl text-center" style={{ background: 'hsl(222, 30%, 12%)' }}>
-          <p className="text-sm" style={{ color: 'hsl(215, 20%, 65%)' }}>No goals defined yet.</p>
+        <div className="p-4 rounded-xl text-center" style={{ background: 'hsl(var(--bg-secondary))' }}>
+          <p className="text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>No goals defined yet.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {categories.filter(c => c.items.length > 0).map(cat => (
-            <div key={cat.label} className="p-3 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
+            <div key={cat.label} className="p-3 rounded-xl" style={{ background: 'hsl(var(--bg-secondary))' }}>
               <p className="text-xs font-semibold uppercase tracking-wider mb-2"
-                style={{ color: 'hsl(262, 83%, 68%)', fontFamily: 'var(--font-heading)' }}
+                style={{ color: 'hsl(var(--accent-light))', fontFamily: 'var(--font-heading)' }}
               >
                 {cat.label}
               </p>
               {cat.items.map(goal => (
                 <div key={goal.id} className="mb-2">
-                  <p className="text-xs font-medium" style={{ color: 'hsl(210, 40%, 96%)' }}>{goal.title}</p>
+                  <p className="text-xs font-medium" style={{ color: 'hsl(var(--text-primary))' }}>{goal.title}</p>
                   <p className="text-xs mt-0.5" style={{ color: 'hsl(var(--text-muted))' }}>{goal.description}</p>
                 </div>
               ))}
@@ -298,24 +298,24 @@ function CompressContent() {
   
   return (
     <div className="space-y-4">
-      <p className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>
+      <p className="text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>
         Vague ambitions transformed into measurable career targets.
       </p>
       
       {targets.length === 0 ? (
-        <div className="p-4 rounded-xl text-center" style={{ background: 'hsl(222, 30%, 12%)' }}>
-          <p className="text-sm" style={{ color: 'hsl(215, 20%, 65%)' }}>No targets defined yet.</p>
+        <div className="p-4 rounded-xl text-center" style={{ background: 'hsl(var(--bg-secondary))' }}>
+          <p className="text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>No targets defined yet.</p>
         </div>
       ) : (
         targets.map(target => (
-          <div key={target.id} className="p-4 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
+          <div key={target.id} className="p-4 rounded-xl" style={{ background: 'hsl(var(--bg-secondary))' }}>
             <div className="mb-3">
               <p className="text-xs font-semibold uppercase tracking-wider mb-1"
                 style={{ color: 'hsl(var(--text-muted))', fontFamily: 'var(--font-heading)' }}
               >
                 Before
               </p>
-              <p className="text-xs italic" style={{ color: 'hsl(215, 20%, 65%)' }}>
+              <p className="text-xs italic" style={{ color: 'hsl(var(--text-secondary))' }}>
                 "{target.originalGoal}"
               </p>
             </div>
@@ -327,7 +327,7 @@ function CompressContent() {
                 After — Compressed
               </p>
             </div>
-            <p className="text-sm font-semibold" style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}>
+            <p className="text-sm font-semibold" style={{ color: 'hsl(var(--text-primary))', fontFamily: 'var(--font-heading)' }}>
               {target.compressedTarget}
             </p>
             <div className="flex items-center gap-2 mt-3">
@@ -346,17 +346,17 @@ function TestContent() {
   
   return (
     <div className="space-y-4">
-      <p className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>
+      <p className="text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>
         Career experiments to validate direction through real experience.
       </p>
       
       {experiments.length === 0 ? (
-        <div className="p-4 rounded-xl text-center" style={{ background: 'hsl(222, 30%, 12%)' }}>
-          <p className="text-sm" style={{ color: 'hsl(215, 20%, 65%)' }}>No experiments run yet.</p>
+        <div className="p-4 rounded-xl text-center" style={{ background: 'hsl(var(--bg-secondary))' }}>
+          <p className="text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>No experiments run yet.</p>
         </div>
       ) : (
         experiments.map(exp => (
-          <div key={exp.id} className="p-4 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
+          <div key={exp.id} className="p-4 rounded-xl" style={{ background: 'hsl(var(--bg-secondary))' }}>
             <div className="flex items-center gap-2 mb-2">
               <span className={`badge ${exp.status === 'completed' ? 'badge-success' : exp.status === 'active' ? 'badge-warning' : 'badge-accent'}`}>
                 {exp.status}
@@ -368,7 +368,7 @@ function TestContent() {
             >
               Hypothesis
             </p>
-            <p className="text-xs font-medium mb-2" style={{ color: 'hsl(210, 40%, 96%)' }}>
+            <p className="text-xs font-medium mb-2" style={{ color: 'hsl(var(--text-primary))' }}>
               {exp.hypothesis}
             </p>
             <p className="text-xs font-semibold uppercase tracking-wider mb-1"
@@ -376,11 +376,11 @@ function TestContent() {
             >
               Experiment
             </p>
-            <p className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>
+            <p className="text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>
               {exp.experiment}
             </p>
             {exp.scores && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 mt-3 pt-3" style={{ borderTop: '1px solid hsl(222, 25%, 16%)' }}>
+              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 mt-3 pt-3" style={{ borderTop: '1px solid hsl(var(--border))' }}>
                 {[
                   { l: 'Interest', v: exp.scores.interest },
                   { l: 'Enjoyment', v: exp.scores.enjoyment },
@@ -416,11 +416,11 @@ function OwnContent() {
   
   return (
     <div className="space-y-4">
-      <p className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>
+      <p className="text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>
         Career capital inventory — skills, projects, and achievements connected to career targets.
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div className="p-4 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
+        <div className="p-4 rounded-xl" style={{ background: 'hsl(var(--bg-secondary))' }}>
           <p className="text-xs font-semibold uppercase tracking-wider mb-3"
             style={{ color: 'hsl(150, 70%, 45%)', fontFamily: 'var(--font-heading)' }}
           >
@@ -429,16 +429,16 @@ function OwnContent() {
           <div className="space-y-2">
             {skills.slice(0, 5).map(skill => (
               <div key={skill.id} className="flex items-center justify-between">
-                <span className="text-xs" style={{ color: 'hsl(210, 40%, 96%)' }}>{skill.skillName}</span>
-                <span className="text-xs font-semibold capitalize" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                <span className="text-xs" style={{ color: 'hsl(var(--text-primary))' }}>{skill.skillName}</span>
+                <span className="text-xs font-semibold capitalize" style={{ color: 'hsl(var(--text-secondary))' }}>
                   {skill.level}
                 </span>
               </div>
             ))}
-            {skills.length === 0 && <p className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>No skills logged.</p>}
+            {skills.length === 0 && <p className="text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>No skills logged.</p>}
           </div>
         </div>
-        <div className="p-4 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
+        <div className="p-4 rounded-xl" style={{ background: 'hsl(var(--bg-secondary))' }}>
           <p className="text-xs font-semibold uppercase tracking-wider mb-3"
             style={{ color: 'hsl(150, 70%, 45%)', fontFamily: 'var(--font-heading)' }}
           >
@@ -447,13 +447,13 @@ function OwnContent() {
           <div className="space-y-2">
             {projects.map(project => (
               <div key={project.id} className="flex items-center justify-between">
-                <span className="text-xs" style={{ color: 'hsl(210, 40%, 96%)' }}>{project.title}</span>
+                <span className="text-xs" style={{ color: 'hsl(var(--text-primary))' }}>{project.title}</span>
                 <span className={`badge badge-success`}>
                   completed
                 </span>
               </div>
             ))}
-            {projects.length === 0 && <p className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>No projects logged.</p>}
+            {projects.length === 0 && <p className="text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>No projects logged.</p>}
           </div>
         </div>
       </div>
@@ -466,17 +466,17 @@ function RunContent() {
   
   return (
     <div className="space-y-4">
-      <p className="text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>
+      <p className="text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>
         Career execution tasks — every task is connected to a career objective with a clear reason.
       </p>
       
       {tasks.length === 0 ? (
-        <div className="p-4 rounded-xl text-center" style={{ background: 'hsl(222, 30%, 12%)' }}>
-          <p className="text-sm" style={{ color: 'hsl(215, 20%, 65%)' }}>No tasks assigned.</p>
+        <div className="p-4 rounded-xl text-center" style={{ background: 'hsl(var(--bg-secondary))' }}>
+          <p className="text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>No tasks assigned.</p>
         </div>
       ) : (
         tasks.map(task => (
-          <div key={task.id} className="p-3 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
+          <div key={task.id} className="p-3 rounded-xl" style={{ background: 'hsl(var(--bg-secondary))' }}>
             <div className="flex items-center gap-2 mb-1">
               <span className={`badge ${task.priority === 'high' ? 'badge-error' : task.priority === 'medium' ? 'badge-warning' : 'badge-info'}`}>
                 {task.priority}
@@ -485,7 +485,7 @@ function RunContent() {
                 {task.status.replace('_', ' ')}
               </span>
             </div>
-            <p className="text-xs font-medium mt-1" style={{ color: 'hsl(210, 40%, 96%)' }}>
+            <p className="text-xs font-medium mt-1" style={{ color: 'hsl(var(--text-primary))' }}>
               {task.title}
             </p>
             <p className="text-xs mt-1 italic" style={{ color: 'hsl(172, 66%, 50%)' }}>

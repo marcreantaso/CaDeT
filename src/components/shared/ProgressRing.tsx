@@ -15,7 +15,7 @@ export function ProgressRing({
   size = 120,
   strokeWidth = 8,
   color,
-  trackColor = 'hsl(222, 30%, 14%)',
+  trackColor = 'hsl(var(--bg-tertiary))',
   label,
   sublabel,
 }: ProgressRingProps) {
@@ -66,7 +66,7 @@ export function ProgressRing({
           {Math.round(value)}
         </motion.span>
         {label && (
-          <span className="text-xs font-medium" style={{ color: 'hsl(215, 20%, 65%)' }}>
+          <span className="text-xs font-medium" style={{ color: 'hsl(var(--text-secondary))' }}>
             {label}
           </span>
         )}

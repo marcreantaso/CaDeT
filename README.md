@@ -52,3 +52,31 @@ Backups include career records, insights, forecasts, and history. Profile settin
 `npm test` exercises IndexedDB with fake-indexeddb: all nine create flows, validation, persistence after reopening, readiness changes, workspace ownership, target activation, backup round trips, duplicate/invalid backup rejection, transactional rollback, task ranking/completion, project evidence linking, experiment ratings, and daily snapshots.
 
 Browser/device QA is still required before release. The implementation environment blocked the local preview through its browser URL policy. Check 320/390 px phones, 768 px tablets, desktop, landscape, 200% zoom, keyboard-only navigation, and dialog focus restoration. The automated tests do not claim to verify rendered layouts.
+
+## Local accounts and hackathon presenter tools
+
+Create a device-local username/password account at `/signup`, then sign in at
+`/login`. Passwords use unique salts and PBKDF2-SHA-256 (600,000 iterations).
+Sessions stay in memory and end on refresh or logout. Accounts use separate
+profile IDs; new accounts do not inherit the old shared workspace. Its owner
+can explicitly claim it once during signup. Existing records remain intact.
+
+This is a local access gate, not a server security boundary. Career data is
+unencrypted in IndexedDB. There is no remote account service, password recovery,
+or cross-device synchronization. Account credentials are excluded from career
+backups. Do not pitch this as production cloud authentication.
+
+Open **Developer Options · Pitch guide** from the dashboard (`/developer`) for
+a seven-step walkthrough, links to live features, technical explanations, and
+a status audit of all ten concept-note sections in the supplied template.
+Business and financial claims are marked as proposals or research still needed.
+The guide does not grant administrator privileges or create sample user data.
+
+## Brand and appearance
+
+The CaDeT mark combines an open C-shaped career loop, a compass needle, and a
+teal milestone. The same SVG supplies in-app branding, the favicon, and PNG
+icons for Android and iOS. Theme controls are available in the app header,
+sign-in/signup, and onboarding. Appearance defaults to the OS preference and
+saves an explicit light/dark choice in localStorage. It synchronizes between
+tabs and loads before React to prevent a flash of the opposite theme.

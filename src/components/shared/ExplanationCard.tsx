@@ -24,13 +24,13 @@ export function ExplanationCard({
         {icon || <Info size={16} style={{ color: accentColor, marginTop: 2 }} />}
         <h4
           className="text-sm font-semibold flex-1"
-          style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}
+          style={{ color: 'hsl(var(--text-primary))', fontFamily: 'var(--font-heading)' }}
         >
           {title}
         </h4>
       </div>
 
-      <p className="text-xs leading-relaxed" style={{ color: 'hsl(215, 20%, 65%)' }}>
+      <p className="text-xs leading-relaxed" style={{ color: 'hsl(var(--text-secondary))' }}>
         {explanation}
       </p>
 
@@ -43,7 +43,7 @@ export function ExplanationCard({
           </p>
           <ul className="space-y-1">
             {evidence.map((e, i) => (
-              <li key={i} className="flex items-start gap-2 text-xs" style={{ color: 'hsl(215, 20%, 65%)' }}>
+              <li key={i} className="flex items-start gap-2 text-xs" style={{ color: 'hsl(var(--text-secondary))' }}>
                 <ChevronRight size={12} style={{ color: accentColor, marginTop: 2, flexShrink: 0 }} />
                 {e}
               </li>

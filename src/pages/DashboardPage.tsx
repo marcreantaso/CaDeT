@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
 import { NextBestAction } from "../components/dashboard/NextBestAction";
@@ -30,6 +31,7 @@ export function DashboardPage() {
         <h1>Welcome back, {user?.fullName?.split(" ")[0] || "Explorer"}</h1>
         <p>Your direction, progress, and next steps in one place.</p>
       </motion.div>
+      <Link to="/developer" className="btn btn-secondary mb-5">Developer Options · Pitch guide</Link>
       <div className="dashboard-grid">
         <div className="dashboard-focus">
           <NextBestAction />
