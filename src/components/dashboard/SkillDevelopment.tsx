@@ -54,7 +54,7 @@ export function SkillDevelopment() {
                 <div className="flex items-center justify-between mb-1">
                   <span
                     className="text-xs font-medium truncate"
-                    style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}
+                    style={{ color: 'hsl(var(--text-primary))', fontFamily: 'var(--font-heading)' }}
                   >
                     {skill.skillName}
                   </span>

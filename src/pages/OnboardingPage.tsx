@@ -1,3 +1,5 @@
+import { ThemeToggle } from "../components/shared/ThemeToggle";
+import { BrandLogo } from "../components/shared/BrandLogo";
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
@@ -112,22 +114,23 @@ export function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row" style={{ background: 'hsl(222, 47%, 6%)' }}>
+    <div className="min-h-screen flex flex-col md:flex-row" style={{ background: 'hsl(var(--bg-primary))' }}>
+      <div className="absolute right-4 top-4"><ThemeToggle /></div>
       {/* Sidebar Progress */}
-      <div className="md:w-64 shrink-0 p-5 md:p-8" style={{ background: 'hsl(222, 47%, 8%)', borderRight: '1px solid hsl(222, 25%, 14%)' }}>
+      <div className="md:w-64 shrink-0 p-5 md:p-8" style={{ background: 'hsl(var(--bg-secondary))', borderRight: '1px solid hsl(var(--border))' }}>
         <div className="mb-10">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold mb-4"
             style={{
-              background: 'linear-gradient(135deg, hsl(262, 83%, 58%), hsl(262, 83%, 68%))',
+              background: 'linear-gradient(135deg, hsl(262, 83%, 58%), hsl(var(--accent-light)))',
               fontFamily: 'var(--font-heading)',
             }}
           >
-            Cd
+            <BrandLogo />
           </div>
-          <h2 className="text-xl font-bold" style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}>
+          <h2 className="text-xl font-bold" style={{ color: 'hsl(var(--text-primary))', fontFamily: 'var(--font-heading)' }}>
             Welcome to CaDeT
           </h2>
-          <p className="text-xs mt-2" style={{ color: 'hsl(215, 20%, 65%)' }}>
+          <p className="text-xs mt-2" style={{ color: 'hsl(var(--text-secondary))' }}>
             Let's establish your baseline.
           </p>
         </div>
@@ -142,14 +145,14 @@ export function OnboardingPage() {
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${isActive ? 'actor-pulse' : ''}`}
                   style={{
-                    background: isPast ? 'hsl(150, 70%, 45%, 0.15)' : isActive ? 'hsl(262, 83%, 58%, 0.15)' : 'hsl(222, 25%, 16%)',
-                    color: isPast ? 'hsl(150, 70%, 45%)' : isActive ? 'hsl(262, 83%, 68%)' : 'hsl(var(--text-muted))',
+                    background: isPast ? 'hsl(150, 70%, 45%, 0.15)' : isActive ? 'hsl(262, 83%, 58%, 0.15)' : 'hsl(var(--border))',
+                    color: isPast ? 'hsl(150, 70%, 45%)' : isActive ? 'hsl(var(--accent-light))' : 'hsl(var(--text-muted))',
                     border: isActive ? '1px solid hsl(262, 83%, 58%, 0.4)' : '1px solid transparent',
                   }}
                 >
                   {isPast ? <CheckCircle size={14} /> : <Icon size={14} />}
                 </div>
-                <span className="text-xs font-medium" style={{ color: isActive ? 'hsl(210, 40%, 96%)' : 'hsl(var(--text-muted))' }}>
+                <span className="text-xs font-medium" style={{ color: isActive ? 'hsl(var(--text-primary))' : 'hsl(var(--text-muted))' }}>
                   {s.title}
                 </span>
               </div>
@@ -175,10 +178,10 @@ export function OnboardingPage() {
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-6"
               >
-                <h1 className="text-3xl font-bold" style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}>
+                <h1 className="text-3xl font-bold" style={{ color: 'hsl(var(--text-primary))', fontFamily: 'var(--font-heading)' }}>
                   Hello, {user?.fullName?.split(' ')[0] || 'there'}! 👋
                 </h1>
-                <p className="text-sm leading-relaxed" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                <p className="text-sm leading-relaxed" style={{ color: 'hsl(var(--text-secondary))' }}>
                   CaDeT is a career development operating system powered by the ACTOR framework (Aim, Compress, Test, Own, Run). 
                   To give you the most accurate insights and track your progress correctly, we need to know where you're starting from.
                 </p>
@@ -196,12 +199,12 @@ export function OnboardingPage() {
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-6"
               >
-                <h1 className="text-2xl font-bold" style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}>
+                <h1 className="text-2xl font-bold" style={{ color: 'hsl(var(--text-primary))', fontFamily: 'var(--font-heading)' }}>
                   Current Status
                 </h1>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(var(--text-secondary))' }}>
                       What is your current or most recent role?
                     </label>
                     <input
@@ -213,7 +216,7 @@ export function OnboardingPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(var(--text-secondary))' }}>
                       Years of professional experience?
                     </label>
                     <input
@@ -226,7 +229,7 @@ export function OnboardingPage() {
                   </div>
                 </div>
                 <div className="flex gap-3 pt-4">
-                  <button onClick={handlePrev} className="btn" style={{ background: 'hsl(222, 25%, 16%)' }}>
+                  <button onClick={handlePrev} className="btn" style={{ background: 'hsl(var(--border))' }}>
                     <ArrowLeft size={16} /> Back
                   </button>
                   <button onClick={handleNext} className="btn btn-primary" disabled={!currentRole}>
@@ -244,10 +247,10 @@ export function OnboardingPage() {
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-6"
               >
-                <h1 className="text-2xl font-bold" style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}>
+                <h1 className="text-2xl font-bold" style={{ color: 'hsl(var(--text-primary))', fontFamily: 'var(--font-heading)' }}>
                   Top Skills
                 </h1>
-                <p className="text-sm" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                <p className="text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>
                   What are 3-5 skills you are most confident in right now? You can add more later.
                 </p>
                 <div className="space-y-4">
@@ -260,15 +263,15 @@ export function OnboardingPage() {
                       onChange={e => setNewSkill(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && handleAddSkill()}
                     />
-                    <button onClick={handleAddSkill} className="btn" style={{ background: 'hsl(222, 25%, 16%)' }}>
+                    <button onClick={handleAddSkill} className="btn" style={{ background: 'hsl(var(--border))' }}>
                       Add
                     </button>
                   </div>
                   
                   {skills.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-4 p-4 rounded-xl" style={{ background: 'hsl(222, 30%, 12%)' }}>
+                    <div className="flex flex-wrap gap-2 mt-4 p-4 rounded-xl" style={{ background: 'hsl(var(--bg-secondary))' }}>
                       {skills.map(skill => (
-                        <div key={skill} className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm" style={{ background: 'hsl(222, 25%, 16%)', color: 'hsl(210, 40%, 96%)' }}>
+                        <div key={skill} className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm" style={{ background: 'hsl(var(--border))', color: 'hsl(var(--text-primary))' }}>
                           {skill}
                           <button onClick={() => setSkills(skills.filter(s => s !== skill))} style={{ color: 'hsl(var(--text-muted))' }}>
                             &times;
@@ -279,7 +282,7 @@ export function OnboardingPage() {
                   )}
                 </div>
                 <div className="flex gap-3 pt-4">
-                  <button onClick={handlePrev} className="btn" style={{ background: 'hsl(222, 25%, 16%)' }}>
+                  <button onClick={handlePrev} className="btn" style={{ background: 'hsl(var(--border))' }}>
                     <ArrowLeft size={16} /> Back
                   </button>
                   <button onClick={handleNext} className="btn btn-primary" disabled={skills.length === 0}>
@@ -297,10 +300,10 @@ export function OnboardingPage() {
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-6"
               >
-                <h1 className="text-2xl font-bold" style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}>
+                <h1 className="text-2xl font-bold" style={{ color: 'hsl(var(--text-primary))', fontFamily: 'var(--font-heading)' }}>
                   What's the Target?
                 </h1>
-                <p className="text-sm leading-relaxed" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                <p className="text-sm leading-relaxed" style={{ color: 'hsl(var(--text-secondary))' }}>
                   In one sentence, what is the next major step you are trying to take in your career? 
                   (It's okay if it's vague, CaDeT will help you compress it later).
                 </p>
@@ -313,7 +316,7 @@ export function OnboardingPage() {
                   />
                 </div>
                 <div className="flex gap-3 pt-4">
-                  <button onClick={handlePrev} className="btn" style={{ background: 'hsl(222, 25%, 16%)' }} disabled={isSaving}>
+                  <button onClick={handlePrev} className="btn" style={{ background: 'hsl(var(--border))' }} disabled={isSaving}>
                     <ArrowLeft size={16} /> Back
                   </button>
                   <button onClick={handleComplete} className="btn btn-primary" disabled={!careerTarget || isSaving}>

@@ -45,13 +45,13 @@ export function InsightsPage() {
         <h1
           className="text-2xl font-bold"
           style={{
-            color: "hsl(210, 40%, 96%)",
+            color: "hsl(var(--text-primary))",
             fontFamily: "var(--font-heading)",
           }}
         >
           Career Insights
         </h1>
-        <p className="text-sm mt-1" style={{ color: "hsl(215, 20%, 65%)" }}>
+        <p className="text-sm mt-1" style={{ color: "hsl(var(--text-secondary))" }}>
           Explainable career trajectory analysis based on your evidence,
           behavior, and experiments
         </p>
@@ -79,7 +79,7 @@ export function InsightsPage() {
           >
             These are hypotheses, not predictions
           </p>
-          <p className="text-xs mt-0.5" style={{ color: "hsl(215, 20%, 65%)" }}>
+          <p className="text-xs mt-0.5" style={{ color: "hsl(var(--text-secondary))" }}>
             Trajectory forecasts are based on your evidence and behavioral
             signals. They are recommendations, not guarantees. Confidence
             reflects data strength, not certainty.
@@ -94,7 +94,7 @@ export function InsightsPage() {
         <h2
           className="text-lg font-bold mb-4"
           style={{
-            color: "hsl(210, 40%, 96%)",
+            color: "hsl(var(--text-primary))",
             fontFamily: "var(--font-heading)",
           }}
         >
@@ -103,7 +103,7 @@ export function InsightsPage() {
 
         {forecasts.length === 0 ? (
           <div className="text-center py-10 glass-card">
-            <p className="text-sm" style={{ color: "hsl(215, 20%, 65%)" }}>
+            <p className="text-sm" style={{ color: "hsl(var(--text-secondary))" }}>
               Not enough data to generate forecasts.
             </p>
           </div>
@@ -152,7 +152,7 @@ export function InsightsPage() {
                           <p
                             className="text-sm font-bold"
                             style={{
-                              color: "hsl(210, 40%, 96%)",
+                              color: "hsl(var(--text-primary))",
                               fontFamily: "var(--font-heading)",
                             }}
                           >
@@ -211,7 +211,7 @@ export function InsightsPage() {
                       >
                         <div
                           className="px-5 pb-5 space-y-4"
-                          style={{ borderTop: "1px solid hsl(222, 25%, 16%)" }}
+                          style={{ borderTop: "1px solid hsl(var(--border))" }}
                         >
                           <div className="pt-4">
                             <h4
@@ -225,7 +225,7 @@ export function InsightsPage() {
                             </h4>
                             <p
                               className="text-xs leading-relaxed"
-                              style={{ color: "hsl(215, 20%, 65%)" }}
+                              style={{ color: "hsl(var(--text-secondary))" }}
                             >
                               {forecast.explanation}
                             </p>
@@ -263,7 +263,7 @@ export function InsightsPage() {
                                           key={i}
                                           className="text-xs"
                                           style={{
-                                            color: "hsl(215, 20%, 65%)",
+                                            color: "hsl(var(--text-secondary))",
                                           }}
                                         >
                                           • {s}
@@ -305,7 +305,7 @@ export function InsightsPage() {
                                           key={i}
                                           className="text-xs"
                                           style={{
-                                            color: "hsl(215, 20%, 65%)",
+                                            color: "hsl(var(--text-secondary))",
                                           }}
                                         >
                                           • {s}
@@ -321,12 +321,12 @@ export function InsightsPage() {
                               forecast.behavioralEvidence.length > 0 && (
                                 <div
                                   className="p-3 rounded-xl"
-                                  style={{ background: "hsl(222, 30%, 12%)" }}
+                                  style={{ background: "hsl(var(--bg-secondary))" }}
                                 >
                                   <p
                                     className="text-xs font-semibold uppercase tracking-wider mb-2"
                                     style={{
-                                      color: "hsl(262, 83%, 68%)",
+                                      color: "hsl(var(--accent-light))",
                                       fontFamily: "var(--font-heading)",
                                     }}
                                   >
@@ -339,7 +339,7 @@ export function InsightsPage() {
                                           key={i}
                                           className="text-xs"
                                           style={{
-                                            color: "hsl(215, 20%, 65%)",
+                                            color: "hsl(var(--text-secondary))",
                                           }}
                                         >
                                           • {s}
@@ -355,7 +355,7 @@ export function InsightsPage() {
                               forecast.experimentResults.length > 0 && (
                                 <div
                                   className="p-3 rounded-xl col-span-1 md:col-span-2"
-                                  style={{ background: "hsl(222, 30%, 12%)" }}
+                                  style={{ background: "hsl(var(--bg-secondary))" }}
                                 >
                                   <p
                                     className="text-xs font-semibold uppercase tracking-wider mb-2"
@@ -373,7 +373,7 @@ export function InsightsPage() {
                                           key={i}
                                           className="text-xs flex items-start gap-2"
                                           style={{
-                                            color: "hsl(215, 20%, 65%)",
+                                            color: "hsl(var(--text-secondary))",
                                           }}
                                         >
                                           <span className="text-xs mt-0.5">
@@ -418,7 +418,7 @@ export function InsightsPage() {
                                           key={i}
                                           className="text-xs"
                                           style={{
-                                            color: "hsl(215, 20%, 65%)",
+                                            color: "hsl(var(--text-secondary))",
                                           }}
                                         >
                                           • {s}
@@ -450,10 +450,10 @@ export function InsightsPage() {
                                         key={i}
                                         className="text-xs px-2 py-1 rounded-lg"
                                         style={{
-                                          background: "hsl(222, 30%, 14%)",
-                                          color: "hsl(215, 20%, 65%)",
+                                          background: "hsl(var(--bg-tertiary))",
+                                          color: "hsl(var(--text-secondary))",
                                           border:
-                                            "1px solid hsl(222, 25%, 18%)",
+                                            "1px solid hsl(var(--border-hover))",
                                         }}
                                       >
                                         {s}
@@ -479,7 +479,7 @@ export function InsightsPage() {
         <h2
           className="text-lg font-bold mb-4"
           style={{
-            color: "hsl(210, 40%, 96%)",
+            color: "hsl(var(--text-primary))",
             fontFamily: "var(--font-heading)",
           }}
         >
@@ -488,7 +488,7 @@ export function InsightsPage() {
 
         {insights.length === 0 ? (
           <div className="text-center py-10 glass-card">
-            <p className="text-sm" style={{ color: "hsl(215, 20%, 65%)" }}>
+            <p className="text-sm" style={{ color: "hsl(var(--text-secondary))" }}>
               No AI insights generated yet.
             </p>
           </div>

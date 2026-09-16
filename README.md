@@ -71,3 +71,12 @@ a seven-step walkthrough, links to live features, technical explanations, and
 a status audit of all ten concept-note sections in the supplied template.
 Business and financial claims are marked as proposals or research still needed.
 The guide does not grant administrator privileges or create sample user data.
+
+## Brand and appearance
+
+The CaDeT mark combines an open C-shaped career loop, a compass needle, and a
+teal milestone. The same SVG supplies in-app branding, the favicon, and PNG
+icons for Android and iOS. Theme controls are available in the app header,
+sign-in/signup, and onboarding. Appearance defaults to the OS preference and
+saves an explicit light/dark choice in localStorage. It synchronizes between
+tabs and loads before React to prevent a flash of the opposite theme.

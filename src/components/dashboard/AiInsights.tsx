@@ -39,7 +39,7 @@ export function AiInsights() {
         </h3>
         <div className="flex items-center gap-1">
           <Brain size={12} style={{ color: 'hsl(262, 83%, 58%)' }} />
-          <span className="text-xs" style={{ color: 'hsl(262, 83%, 68%)' }}>
+          <span className="text-xs" style={{ color: 'hsl(var(--accent-light))' }}>
             {insights.filter(i => !i.isRead).length} new
           </span>
         </div>
@@ -55,7 +55,7 @@ export function AiInsights() {
               key={insight.id}
               className="p-3 rounded-xl cursor-pointer transition-all"
               style={{
-                background: !insight.isRead ? `color-mix(in srgb, ${color} 3.14%, transparent)` : 'hsl(222, 30%, 12%)',
+                background: !insight.isRead ? `color-mix(in srgb, ${color} 3.14%, transparent)` : 'hsl(var(--bg-secondary))',
                 border: !insight.isRead ? `1px solid color-mix(in srgb, ${color} 12.55%, transparent)` : '1px solid transparent',
               }}
               initial={{ opacity: 0 }}
@@ -68,7 +68,7 @@ export function AiInsights() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-xs font-semibold truncate"
-                      style={{ color: 'hsl(210, 40%, 96%)', fontFamily: 'var(--font-heading)' }}
+                      style={{ color: 'hsl(var(--text-primary))', fontFamily: 'var(--font-heading)' }}
                     >
                       {insight.title}
                     </p>
@@ -76,12 +76,12 @@ export function AiInsights() {
                       <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: color }} />
                     )}
                   </div>
-                  <p className="text-xs mt-1 mb-2 leading-relaxed" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                  <p className="text-xs mt-1 mb-2 leading-relaxed" style={{ color: 'hsl(var(--text-secondary))' }}>
                     {insight.description}
                   </p>
                   <ul className="space-y-1">
                     {insight.evidence.map((e: string, i: number) => (
-                      <li key={i} className="text-xs flex items-start gap-2" style={{ color: 'hsl(215, 20%, 65%)' }}>
+                      <li key={i} className="text-xs flex items-start gap-2" style={{ color: 'hsl(var(--text-secondary))' }}>
                         <span className="text-xs mt-0.5" style={{ color: INSIGHT_COLORS[insight.type as keyof typeof INSIGHT_COLORS] }}>•</span>
                         {e}
                       </li>
@@ -90,7 +90,7 @@ export function AiInsights() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between mt-2 pt-2" style={{ borderTop: '1px solid hsl(222, 25%, 16%)' }}>
+              <div className="flex items-center justify-between mt-2 pt-2" style={{ borderTop: '1px solid hsl(var(--border))' }}>
                 <span className="text-xs" style={{ color: 'hsl(var(--text-muted))' }}>
                   {insight.confidence}% confidence • {insight.evidence.length} evidence points
                 </span>

@@ -34,7 +34,7 @@ export function CurrentExperiments() {
               key={exp.id}
               className="p-3 rounded-xl"
               style={{
-                background: isActive ? 'hsl(45, 93%, 55%, 0.06)' : 'hsl(222, 30%, 12%)',
+                background: isActive ? 'hsl(45, 93%, 55%, 0.06)' : 'hsl(var(--bg-secondary))',
                 border: isActive ? '1px solid hsl(45, 93%, 55%, 0.2)' : '1px solid transparent',
               }}
               initial={{ opacity: 0 }}
@@ -50,7 +50,7 @@ export function CurrentExperiments() {
                   <FlaskConical size={14} style={{ color: 'hsl(var(--text-muted))', marginTop: 1 }} />
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium" style={{ color: 'hsl(210, 40%, 96%)' }}>
+                  <p className="text-xs font-medium" style={{ color: 'hsl(var(--text-primary))' }}>
                     {exp.hypothesis}
                   </p>
                   <p className="text-xs mt-0.5" style={{ color: 'hsl(var(--text-muted))' }}>
@@ -61,7 +61,7 @@ export function CurrentExperiments() {
 
               {/* Scores for completed experiments */}
               {isCompleted && exp.scores && (
-                <div className="flex gap-2 mt-2 pt-2" style={{ borderTop: '1px solid hsl(222, 25%, 16%)' }}>
+                <div className="flex gap-2 mt-2 pt-2" style={{ borderTop: '1px solid hsl(var(--border))' }}>
                   {[
                     { label: 'Interest', value: exp.scores.interest },
                     { label: 'Enjoy', value: exp.scores.enjoyment },
