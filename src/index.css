@@ -912,3 +912,5 @@ svg { flex-shrink: 0; }
 :root[data-theme="light"] .form-error { color: #991b1b; }
 :root[data-theme="light"] .form-success { color: #166534; }
 @media (max-width: 30rem) { .theme-toggle span { display: none; } .top-bar-location { min-width: 0; } }
+
+.starter-choices { display: grid; gap: .75rem; margin-top: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }

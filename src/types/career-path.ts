@@ -15,6 +15,7 @@ export interface CareerSkillRequirement {
 }
 
 export interface CareerPathDefinition {
+  area: import("../data/careerAreas").CareerArea;
   id: string;
   title: string;
   summary: string;

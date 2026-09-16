@@ -43,12 +43,12 @@ export function CareerMapPage() {
   const activePath = CAREER_PATH_BY_ID[activePathId] ?? CAREER_PATHS[0];
   const activeAlignment = alignments.find((alignment) => alignment.pathId === activePath.id);
   const displayedAlignments = useMemo(() => {
-    const primary = alignments.find((alignment) => alignment.pathId === primaryPathId);
-    const adjacentIds = CAREER_PATH_BY_ID[primaryPathId]?.adjacentPathIds ?? [];
+    const primary = alignments.find((alignment) => alignment.pathId === activePath.id);
+    const adjacentIds = CAREER_PATH_BY_ID[activePath.id]?.adjacentPathIds ?? [];
     return [primary, ...adjacentIds.map((id) => alignments.find((item) => item.pathId === id))].filter(
       Boolean,
     ) as typeof alignments;
-  }, [alignments, primaryPathId]);
+  }, [alignments, activePath.id]);
   const simulation = useMemo(
     () =>
       data
@@ -128,7 +128,7 @@ export function CareerMapPage() {
       <section className="twin-summary" aria-label="Digital twin summary">
         <article className="glass-card twin-stat">
           <Target size={20} />
-          <div><span>Declared direction</span><strong>{CAREER_PATH_BY_ID[primaryPathId].title}</strong></div>
+          <div><span>Suggested starting path</span><strong>{CAREER_PATH_BY_ID[primaryPathId].title}</strong></div>
         </article>
         <article className="glass-card twin-stat">
           <Sparkles size={20} />
@@ -142,9 +142,10 @@ export function CareerMapPage() {
 
       <section className="glass-card career-graph" aria-labelledby="career-graph-title">
         <div className="section-title-row">
-          <div><p className="eyebrow">Career map</p><h2 id="career-graph-title">Original path and adjacent options</h2></div>
+          <div><p className="eyebrow">Career map</p><h2 id="career-graph-title">Explore fields and adjacent options</h2></div>
           <span className="badge badge-accent">Select a path to inspect it</span>
         </div>
+        <label className="block mt-4">Explore any career area<select className="input-dark w-full mt-2" value={activePath.id} onChange={e => selectPath(e.target.value)}>{CAREER_PATHS.map(path => <option key={path.id} value={path.id}>{path.area} · {path.title}</option>)}</select></label>
         <div className="career-origin"><span>You</span><small>Skills + evidence + goals</small></div>
         <div className="career-connector" aria-hidden="true" />
         <div className="career-branches">
@@ -155,7 +156,7 @@ export function CareerMapPage() {
               onClick={() => selectPath(alignment.pathId)}
               aria-pressed={activePath.id === alignment.pathId}
             >
-              <span>{index === 0 ? "Original path" : "What if?"}</span>
+              <span>{index === 0 ? "Exploring" : "What if?"}</span>
               <strong>{alignment.title}</strong>
               <b>{alignment.score}%</b>
               <small>current evidence match</small>

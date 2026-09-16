@@ -62,7 +62,7 @@ export function OnboardingPage() {
             id: crypto.randomUUID(),
             userId: user.id,
             skillName,
-            category: 'technical',
+            category: 'domain',
             level: 'intermediate',
             confidence: 50,
             evidenceCount: 0,
@@ -75,7 +75,7 @@ export function OnboardingPage() {
       }
 
       // 3. Add initial Career Target
-      if (careerTarget) {
+      if (careerTarget.trim()) {
         await db.career_targets.add({
           id: crypto.randomUUID(),
           userId: user.id,
@@ -210,7 +210,7 @@ export function OnboardingPage() {
                     <input
                       type="text"
                       className="input-dark w-full"
-                      placeholder="e.g., Junior Frontend Developer, Student, Unemployed"
+                      placeholder="e.g., Student, Content Creator, Service Assistant, Exploring"
                       value={currentRole}
                       onChange={e => setCurrentRole(e.target.value)}
                     />
@@ -258,7 +258,7 @@ export function OnboardingPage() {
                     <input
                       type="text"
                       className="input-dark flex-1"
-                      placeholder="e.g., React, Python, Project Management"
+                      placeholder="e.g., Communication, Writing, Planning, Coding"
                       value={newSkill}
                       onChange={e => setNewSkill(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && handleAddSkill()}
@@ -285,8 +285,8 @@ export function OnboardingPage() {
                   <button onClick={handlePrev} className="btn" style={{ background: 'hsl(var(--border))' }}>
                     <ArrowLeft size={16} /> Back
                   </button>
-                  <button onClick={handleNext} className="btn btn-primary" disabled={skills.length === 0}>
-                    Next Step <ArrowRight size={16} />
+                  <button onClick={handleNext} className="btn btn-primary" >
+                    {skills.length ? 'Next Step' : 'I’m still exploring — skip skills'} <ArrowRight size={16} />
                   </button>
                 </div>
               </motion.div>
@@ -310,7 +310,7 @@ export function OnboardingPage() {
                 <div className="space-y-4">
                   <textarea
                     className="input-dark w-full h-32 resize-none"
-                    placeholder="e.g., I want to become a Senior Engineer at a climate tech startup."
+                    placeholder="e.g., I want to explore teaching, business, design, sports, or technology."
                     value={careerTarget}
                     onChange={e => setCareerTarget(e.target.value)}
                   />
@@ -319,8 +319,8 @@ export function OnboardingPage() {
                   <button onClick={handlePrev} className="btn" style={{ background: 'hsl(var(--border))' }} disabled={isSaving}>
                     <ArrowLeft size={16} /> Back
                   </button>
-                  <button onClick={handleComplete} className="btn btn-primary" disabled={!careerTarget || isSaving}>
-                    {isSaving ? 'Saving Profile...' : 'Complete & Enter CaDeT'} <ArrowRight size={16} />
+                  <button onClick={handleComplete} className="btn btn-primary" disabled={isSaving}>
+                    {isSaving ? 'Saving Profile...' : careerTarget.trim() ? 'Complete & Enter CaDeT' : 'Explore without a target'} <ArrowRight size={16} />
                   </button>
                 </div>
               </motion.div>

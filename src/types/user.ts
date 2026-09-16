@@ -22,6 +22,7 @@ export interface Profile {
   preferredIndustries: string[];
   onboardingCompleted: boolean;
   onboardingStep: number;
+  tutorialCompleted?: boolean;
   createdAt: string;
   updatedAt: string;
 }
