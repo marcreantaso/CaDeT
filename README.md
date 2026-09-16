@@ -80,3 +80,26 @@ icons for Android and iOS. Theme controls are available in the app header,
 sign-in/signup, and onboarding. Appearance defaults to the OS preference and
 saves an explicit light/dark choice in localStorage. It synchronizes between
 tabs and loads before React to prevent a flash of the opposite theme.
+
+## Installed app icons and update notifications
+
+Versioned opaque PNGs under `/icons/` supply the explicit 180px Apple touch icon
+and 192/512px Android icons. A separate maskable Android icon keeps the artwork
+inside its safe area. The root Apple icon remains available as a fallback.
+
+Service-worker registration uses prompt mode. A persistent in-app notification
+offers Update now or Later when a new worker is waiting. Later collapses it to
+an update button. Checks run on registration, returning to a visible app,
+reconnecting, and hourly while visible and online. The first offline-ready state
+also gets a dismissible notice. Updates reload the app, so save changes first;
+local accounts sign out on reload. This is not background push notification.
+
+Verify installation on a stable production origin with publicly accessible icon
+URLs: protected Vercel previews can interfere with installation asset retrieval.
+Existing iOS Home Screen artwork may remain cached; the app cannot force iOS to
+replace an already installed icon. Back up career records before removing an
+installed app or clearing site data, and never clear data simply to refresh art.
+
+Release QA: install on iOS/Android; deploy a second build on the SAME origin;
+reopen the app; verify the banner, Later, Update, offline behavior, and saved data.
+Build and unit tests cannot substitute for that device lifecycle test.
