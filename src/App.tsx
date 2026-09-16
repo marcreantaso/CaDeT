@@ -42,6 +42,11 @@ const RecordsPage = lazy(() =>
     default: module.RecordsPage,
   })),
 );
+const CareerMapPage = lazy(() =>
+  import("./pages/CareerMapPage").then((module) => ({
+    default: module.CareerMapPage,
+  })),
+);
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -143,6 +148,7 @@ function AppRoutes() {
           <Route index element={<DashboardPage />} />
           <Route path="journey" element={<JourneyPage />} />
           <Route path="records" element={<RecordsPage />} />
+          <Route path="career-map" element={<CareerMapPage />} />
           <Route path="skills" element={<SkillsPage />} />
           <Route path="insights" element={<InsightsPage />} />
         </Route>

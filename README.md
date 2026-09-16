@@ -1,5 +1,24 @@
 # CaDeT
 
+## Career Digital Twin
+
+The Career Map turns a user's saved goals, skills, projects, experience, and
+ACTOR progress into an explainable **career evidence alignment** model. It does
+not predict employment success.
+
+Each supported path is scored with explicit weights:
+
+- skill match: 40%
+- completed project evidence: 25%
+- relevant experience: 15%
+- ACTOR execution progress: 10%
+- declared goal intent: 10%
+
+The What-If simulator works on a temporary copy of the user's data. Simulated
+scores never change real records. A user can convert selected changes into a
+real 14-day ACTOR TEST; CaDeT then atomically creates the experiment, evidence
+tasks, ACTOR event, and stage transition in IndexedDB.
+
 A local-first career development tracker built with React, TypeScript, Vite, and Dexie/IndexedDB.
 
 ## Run and verify

@@ -1,0 +1,91 @@
+import type { CareerPathDefinition } from "../types/career-path";
+
+// This is an explicit, versioned competency catalogue. Alignment is calculated
+// against these requirements; it is not a prediction of employment success.
+export const CAREER_PATHS: CareerPathDefinition[] = [
+  {
+    id: "frontend-developer",
+    title: "Frontend Developer",
+    summary: "Build accessible, responsive interfaces for web products.",
+    aliases: ["frontend", "front-end", "web developer", "ui developer"],
+    skills: [
+      { name: "HTML", weight: 1, targetConfidence: 70 },
+      { name: "CSS", aliases: ["tailwind"], weight: 1, targetConfidence: 70 },
+      { name: "JavaScript", aliases: ["typescript"], weight: 1.25, targetConfidence: 75 },
+      { name: "React", weight: 1.2, targetConfidence: 70 },
+      { name: "Git", aliases: ["github"], weight: 0.7, targetConfidence: 60 },
+      { name: "Testing", aliases: ["vitest", "jest"], weight: 0.85, targetConfidence: 60 },
+      { name: "Accessibility", aliases: ["a11y"], weight: 0.65, targetConfidence: 55 },
+    ],
+    projectKeywords: ["website", "dashboard", "frontend", "react", "pwa", "ui", "portfolio"],
+    experienceKeywords: ["frontend", "web", "ui", "interface", "responsive"],
+    interestKeywords: ["frontend", "web", "interface", "ui", "design"],
+    adjacentPathIds: ["full-stack-developer", "ai-application-developer"],
+    proofProject: "Ship an accessible React dashboard with tests and a public repository.",
+  },
+  {
+    id: "full-stack-developer",
+    title: "Full-Stack Developer",
+    summary: "Deliver complete web products across client, server, and data layers.",
+    aliases: ["full stack", "full-stack", "software engineer", "web engineer"],
+    skills: [
+      { name: "JavaScript", aliases: ["typescript"], weight: 1.1, targetConfidence: 75 },
+      { name: "React", weight: 0.9, targetConfidence: 65 },
+      { name: "Node.js", aliases: ["node", "express"], weight: 1.15, targetConfidence: 65 },
+      { name: "SQL", aliases: ["postgresql", "mysql"], weight: 1, targetConfidence: 65 },
+      { name: "REST APIs", aliases: ["api", "rest"], weight: 1, targetConfidence: 65 },
+      { name: "Authentication", aliases: ["auth"], weight: 0.8, targetConfidence: 60 },
+      { name: "Git", aliases: ["github"], weight: 0.6, targetConfidence: 60 },
+      { name: "Testing", aliases: ["vitest", "jest"], weight: 0.75, targetConfidence: 60 },
+    ],
+    projectKeywords: ["full stack", "pwa", "api", "database", "auth", "dashboard", "saas"],
+    experienceKeywords: ["full stack", "software", "api", "database", "web"],
+    interestKeywords: ["full stack", "software", "product", "web", "application"],
+    adjacentPathIds: ["frontend-developer", "backend-developer", "ai-application-developer"],
+    proofProject: "Build and deploy a tested full-stack app with authentication and PostgreSQL.",
+  },
+  {
+    id: "backend-developer",
+    title: "Backend Developer",
+    summary: "Design reliable APIs, services, databases, and server-side systems.",
+    aliases: ["backend", "back-end", "api developer", "server developer"],
+    skills: [
+      { name: "Node.js", aliases: ["node", "express"], weight: 1, targetConfidence: 70 },
+      { name: "Python", aliases: ["fastapi", "django", "flask"], weight: 0.9, targetConfidence: 65 },
+      { name: "SQL", aliases: ["postgresql", "mysql"], weight: 1.15, targetConfidence: 70 },
+      { name: "REST APIs", aliases: ["api", "rest"], weight: 1.2, targetConfidence: 70 },
+      { name: "Authentication", aliases: ["auth", "security"], weight: 0.85, targetConfidence: 65 },
+      { name: "Testing", aliases: ["unit testing", "integration testing"], weight: 0.85, targetConfidence: 65 },
+      { name: "Git", aliases: ["github"], weight: 0.55, targetConfidence: 60 },
+    ],
+    projectKeywords: ["api", "backend", "database", "server", "authentication", "service"],
+    experienceKeywords: ["backend", "server", "database", "api", "systems"],
+    interestKeywords: ["backend", "server", "database", "systems", "api"],
+    adjacentPathIds: ["full-stack-developer", "ai-application-developer"],
+    proofProject: "Publish a documented REST API with authentication, tests, and a relational database.",
+  },
+  {
+    id: "ai-application-developer",
+    title: "AI Application Developer",
+    summary: "Integrate AI models into useful, evaluated software products.",
+    aliases: ["ai engineer", "ai developer", "machine learning", "ml engineer", "llm developer"],
+    skills: [
+      { name: "Python", aliases: ["fastapi"], weight: 1.2, targetConfidence: 70 },
+      { name: "AI Integration", aliases: ["llm", "gemini", "openai", "prompt engineering"], weight: 1.15, targetConfidence: 65 },
+      { name: "Data Processing", aliases: ["pandas", "data"], weight: 0.95, targetConfidence: 65 },
+      { name: "Model Evaluation", aliases: ["evaluation", "metrics", "testing"], weight: 1, targetConfidence: 60 },
+      { name: "REST APIs", aliases: ["api", "rest"], weight: 0.8, targetConfidence: 60 },
+      { name: "SQL", aliases: ["postgresql", "database"], weight: 0.7, targetConfidence: 55 },
+      { name: "Git", aliases: ["github"], weight: 0.5, targetConfidence: 60 },
+    ],
+    projectKeywords: ["ai", "llm", "chatbot", "model", "classifier", "recommendation", "gemini"],
+    experienceKeywords: ["ai", "machine learning", "data", "model", "automation"],
+    interestKeywords: ["ai", "machine learning", "llm", "intelligence", "automation"],
+    adjacentPathIds: ["full-stack-developer", "backend-developer", "frontend-developer"],
+    proofProject: "Build an AI-assisted app with a measured evaluation set and documented failure cases.",
+  },
+];
+
+export const CAREER_PATH_BY_ID = Object.fromEntries(
+  CAREER_PATHS.map((path) => [path.id, path]),
+) as Record<string, CareerPathDefinition>;
