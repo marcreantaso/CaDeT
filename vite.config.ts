@@ -8,9 +8,12 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'theme.js', 'apple-touch-icon.png'],
+      registerType: 'prompt',
+      includeAssets: ['favicon.svg', 'theme.js', 'apple-touch-icon.png', 'icons/*.png'],
       manifest: {
+        id: '/',
+        start_url: '/',
+        scope: '/',
         name: 'CaDeT: Career Development Tracker',
         short_name: 'CaDeT',
         description: 'Personal career development operating system',
@@ -18,13 +21,14 @@ export default defineConfig({
         background_color: '#0d1321',
         display: 'standalone',
         icons: [
+          { src: '/icons/cadet-v2-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
           {
-            src: 'pwa-192x192.png',
+            src: '/icons/cadet-v2-192.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: 'pwa-512x512.png',
+            src: '/icons/cadet-v2-512.png',
             sizes: '512x512',
             type: 'image/png'
           }

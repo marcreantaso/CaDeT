@@ -912,3 +912,7 @@ svg { flex-shrink: 0; }
 :root[data-theme="light"] .form-error { color: #991b1b; }
 :root[data-theme="light"] .form-success { color: #166534; }
 @media (max-width: 30rem) { .theme-toggle span { display: none; } .top-bar-location { min-width: 0; } }
+
+.pwa-notice { position: fixed; z-index: 100; right: max(1rem, env(safe-area-inset-right)); bottom: calc(6rem + env(safe-area-inset-bottom)); max-width: min(26rem, calc(100vw - 2rem)); padding: 1rem; background: hsl(var(--bg-secondary)); color: hsl(var(--text-primary)); border: 1px solid hsl(var(--border-hover)); border-radius: 1rem; box-shadow: var(--shadow-lg); }
+.pwa-notice p { font-size: .875rem; margin-top: .5rem; }
+@media (min-width: 48rem) { .pwa-notice { bottom: 1.5rem; } }

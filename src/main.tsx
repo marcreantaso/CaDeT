@@ -1,3 +1,4 @@
+import { PWAUpdateNotice } from "./components/shared/PWAUpdateNotice"
 import { StrictMode } from 'react'
 import { MotionConfig } from 'framer-motion'
 import { createRoot } from 'react-dom/client'
@@ -13,6 +14,7 @@ createRoot(document.getElementById('root')!).render(
     <MotionConfig reducedMotion="user">
       <BrowserRouter>
         <App />
+        <PWAUpdateNotice />
       </BrowserRouter>
     </MotionConfig>
   </StrictMode>,
