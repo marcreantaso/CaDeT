@@ -45,7 +45,7 @@ Open **Records → Backup and restore**. Export the JSON file and keep it outsid
 
 Restore accepts CaDeT version-1 backups up to 5 MB and 10,000 records per collection. A validated preview appears before import. All writes run in one transaction: failure rolls everything back. Missing records are added; existing records are retained unchanged. Imported records belong to the current workspace. Existing active targets take precedence over imported ones.
 
-Backups include career records, insights, forecasts, and history. Profile settings and ACTOR stage settings are excluded. Browser storage is device-local; clearing site data can erase it. There is no cloud synchronization or real sign-in system in the existing offline auth provider.
+Backups include career records, saved AIM plans, insights, forecasts, and history. Original version-1 backups without AIM plans remain supported. Profile settings and ACTOR stage settings are excluded. Browser storage is device-local; clearing site data can erase it. There is no cloud synchronization. The local username/password gate is described below.
 
 ## Verification
 
@@ -80,3 +80,13 @@ icons for Android and iOS. Theme controls are available in the app header,
 sign-in/signup, and onboarding. Appearance defaults to the OS preference and
 saves an explicit light/dark choice in localStorage. It synchronizes between
 tabs and loads before React to prevent a flash of the opposite theme.
+
+## Structured AIM and learning plans
+
+New accounts enter a six-step categorized setup with dependent field, specialization and role selections, Other inputs and a Not sure yet path. Eight fields cover technology, business, creative work, engineering, education, health, hospitality and sports/esports. Skills have explicit categories and self-assessed levels; no experience or skill entries are required to start.
+
+Open **Dashboard → My learning plan** to review four persisted learning actions, field-relevant resource directories and support guidance. Revisit AIM to create a revised plan; previous tasks and evidence remain saved. Suggestions are rule-based and the community panel is discovery guidance, not a live matching service. Career Map's scored example profiles are explicitly labeled as examples for unsupported AIM roles.
+
+See [concept-note alignment and pitch walkthrough](docs/concept-alignment.md) for the reviewed Ad Astra 6 document, demonstrable flows and remaining AI, SaaS, community, institutional and validation work.
+
+PWA installation includes a dedicated opaque 512 px maskable icon for Android and an opaque 180 px Apple touch icon. Their foreground stays inside the central mask-safe area. The original brand SVG remains the in-app/favicon asset; `public/icon-maskable.svg` is the padded installation source. To regenerate PNGs, make `sharp` available and run `node scripts/generate-icons.mjs` (or set `CADET_SHARP_PATH` to its absolute package path). Already-installed iOS shortcuts may require removing the old home-screen shortcut and adding it again to refresh the icon; do not clear site data, which holds local accounts and records.

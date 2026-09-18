@@ -13,7 +13,10 @@ import type { AiInsight } from "../types/insights";
 import type { Achievement, Reflection } from "../types/career";
 import type { ActorState, ActorEvent } from "../types/actor";
 
+import type { AimPlan } from "../types/aim";
+
 export class CadetDatabase extends Dexie {
+  aim_plans!: Table<AimPlan, string>;
   accounts!: Table<import("./localAuth").LocalAccount, string>;
   profiles!: Table<Profile, string>;
   skills!: Table<Skill, string>;
@@ -87,6 +90,7 @@ export class CadetDatabase extends Dexie {
       actor_events: "id, userId, stage, eventType",
     });
     this.version(5).stores({ accounts: "id, &username" });
+    this.version(6).stores({ aim_plans: "id, userId, createdAt" });
     this.version(4).stores({
       achievements: "id, userId, dateEarned",
       reflections: "id, userId, createdAt",

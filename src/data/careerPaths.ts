@@ -1,9 +1,11 @@
+import { ADDITIONAL_PATHS } from "./careerAreas";
 import type { CareerPathDefinition } from "../types/career-path";
 
 // This is an explicit, versioned competency catalogue. Alignment is calculated
 // against these requirements; it is not a prediction of employment success.
 export const CAREER_PATHS: CareerPathDefinition[] = [
   {
+    area: "Technology",
     id: "frontend-developer",
     title: "Frontend Developer",
     summary: "Build accessible, responsive interfaces for web products.",
@@ -24,6 +26,7 @@ export const CAREER_PATHS: CareerPathDefinition[] = [
     proofProject: "Ship an accessible React dashboard with tests and a public repository.",
   },
   {
+    area: "Technology",
     id: "full-stack-developer",
     title: "Full-Stack Developer",
     summary: "Deliver complete web products across client, server, and data layers.",
@@ -45,6 +48,7 @@ export const CAREER_PATHS: CareerPathDefinition[] = [
     proofProject: "Build and deploy a tested full-stack app with authentication and PostgreSQL.",
   },
   {
+    area: "Technology",
     id: "backend-developer",
     title: "Backend Developer",
     summary: "Design reliable APIs, services, databases, and server-side systems.",
@@ -65,6 +69,7 @@ export const CAREER_PATHS: CareerPathDefinition[] = [
     proofProject: "Publish a documented REST API with authentication, tests, and a relational database.",
   },
   {
+    area: "Technology",
     id: "ai-application-developer",
     title: "AI Application Developer",
     summary: "Integrate AI models into useful, evaluated software products.",
@@ -84,6 +89,7 @@ export const CAREER_PATHS: CareerPathDefinition[] = [
     adjacentPathIds: ["full-stack-developer", "backend-developer", "frontend-developer"],
     proofProject: "Build an AI-assisted app with a measured evaluation set and documented failure cases.",
   },
+  ...ADDITIONAL_PATHS,
 ];
 
 export const CAREER_PATH_BY_ID = Object.fromEntries(

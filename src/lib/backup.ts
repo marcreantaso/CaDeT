@@ -1,3 +1,5 @@
+import { validateAim } from "./aim";
+import type { AimInput } from "../types/aim";
 import { db } from "./db";
 import { recordTables } from "./records";
 
@@ -53,6 +55,23 @@ const scores = object({
   wouldRepeat: bool,
 });
 const schemas: Record<string, Check> = {
+  aim_plans: object({
+    ...updated,
+    version: oneOf(1),
+    targetId: nonempty,
+    taskIds: (value) =>
+      list(nonempty)(value) &&
+      (value as unknown[]).length === 4 &&
+      new Set(value as unknown[]).size === 4,
+    summary: nonempty,
+    input: (value) => {
+      try {
+        return validateAim(value as AimInput).length === 0;
+      } catch {
+        return false;
+      }
+    },
+  }),
   skills: object({
     ...updated,
     skillName: nonempty,
@@ -217,6 +236,7 @@ const schemas: Record<string, Check> = {
   }),
 };
 export const backupTables = [
+  "aim_plans",
   ...Object.values(recordTables),
   "progress_history",
   "forecast_history",
@@ -245,6 +265,8 @@ export function parseBackup(raw: string): Backup {
     Array.isArray(data.tables)
   )
     throw new Error("This is not a supported CaDeT backup.");
+  // Original version-1 backups predate AIM plans. Keep them importable.
+  if (!Object.hasOwn(data.tables, "aim_plans")) data.tables.aim_plans = [];
   if (
     Object.keys(data.tables).length !== backupTables.length ||
     Object.keys(data.tables).some((key) => !backupTables.includes(key))

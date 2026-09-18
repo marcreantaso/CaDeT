@@ -1,333 +1,522 @@
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useLiveQuery } from "dexie-react-hooks";
+import { ArrowLeft, ArrowRight, Check, X } from "lucide-react";
 import { ThemeToggle } from "../components/shared/ThemeToggle";
 import { BrandLogo } from "../components/shared/BrandLogo";
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ArrowLeft, Target, Rocket, Briefcase, Zap, CheckCircle } from 'lucide-react';
-
+import { ChoiceField } from "../components/shared/ChoiceField";
+import { useAuth } from "../contexts/AuthContext";
+import {
+  FIELDS,
+  STATUSES,
+  EXPERIENCE,
+  OUTCOMES,
+  VALUES,
+  ENVIRONMENTS,
+  FORMATS,
+  SUPPORT,
+  CATEGORY_OPTIONS,
+  LEVEL_OPTIONS,
+} from "../data/aimCatalog";
+import {
+  aimOptions,
+  aimSummary,
+  blankChoice,
+  emptyAim,
+  learningModules,
+  saveAim,
+  validateAim,
+} from "../lib/aim";
+import { db } from "../lib/db";
+import type { AimInput, Choice } from "../types/aim";
+import type { SkillCategory, SkillLevel } from "../types/skills";
 
 const STEPS = [
-  { id: 0, title: 'Welcome', icon: Rocket },
-  { id: 1, title: 'Current Status', icon: Briefcase },
-  { id: 2, title: 'Top Skills', icon: Zap },
-  { id: 3, title: 'Career Target', icon: Target },
+  "Your starting point",
+  "Find your direction",
+  "Define the outcome",
+  "Skill baseline",
+  "Learning & support",
+  "Review your AIM",
 ];
-
-export function OnboardingPage() {
-  const { user, updateProfile } = useAuth();
-  const navigate = useNavigate();
-  const [step, setStep] = useState(0);
-  const [isSaving, setIsSaving] = useState(false);
-
-  // Form State
-  const [currentRole, setCurrentRole] = useState('');
-  const [yearsExperience, setYearsExperience] = useState(0);
-  const [skills, setSkills] = useState<string[]>([]);
-  const [newSkill, setNewSkill] = useState('');
-  const [careerTarget, setCareerTarget] = useState('');
-
-  const handleNext = () => setStep(s => Math.min(STEPS.length - 1, s + 1));
-  const handlePrev = () => setStep(s => Math.max(0, s - 1));
-
-  const handleAddSkill = () => {
-    if (newSkill.trim() && !skills.includes(newSkill.trim())) {
-      setSkills([...skills, newSkill.trim()]);
-      setNewSkill('');
-    }
-  };
-
-  const handleComplete = async () => {
-    if (!user) return;
-    setIsSaving(true);
-    
-    try {
-      // 1. Update Profile
-      await updateProfile({
-        currentRole: currentRole,
-        yearsExperience: yearsExperience,
-        onboardingCompleted: true,
-        onboardingStep: STEPS.length,
-      });
-
-      // 2. Add Skills
-      const { db } = await import('../lib/db');
-      
-      for (const skillName of skills) {
-        // Find existing skill
-        const existingSkill = await db.skills.where('skillName').equals(skillName).filter(s => s.userId === user.id).first();
-
-        if (!existingSkill) {
-          await db.skills.add({
-            id: crypto.randomUUID(),
-            userId: user.id,
-            skillName,
-            category: 'technical',
-            level: 'intermediate',
-            confidence: 50,
-            evidenceCount: 0,
-            linkedProjects: [],
-            linkedExperiments: [],
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          });
-        }
-      }
-
-      // 3. Add initial Career Target
-      if (careerTarget) {
-        await db.career_targets.add({
-          id: crypto.randomUUID(),
-          userId: user.id,
-          originalGoal: careerTarget,
-          compressedTarget: careerTarget,
-          roleClarity: 50,
-          skillClarity: 50,
-          industryClarity: 50,
-          experienceClarity: 50,
-          evidenceClarity: 10,
-          overallClarity: 30,
-          isActive: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        });
-
-        await db.actor_events.add({
-          id: crypto.randomUUID(),
-          userId: user.id,
-          stage: 'compress',
-          eventType: 'target_created',
-          title: 'Initial Career Target Set',
-          description: `Targeted: ${careerTarget}`,
-          metadata: {},
-          createdAt: new Date().toISOString(),
-        });
-      }
-
-      navigate('/');
-    } catch (error) {
-      console.error('Failed to complete onboarding:', error);
-      alert('Something went wrong saving your profile.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
+export function OnboardingPage({ editing = false }: { editing?: boolean }) {
+  const { user } = useAuth();
+  const saved = useLiveQuery(
+    async () =>
+      user
+        ? ((
+            await db.aim_plans
+              .where("userId")
+              .equals(user.id)
+              .sortBy("createdAt")
+          ).at(-1) ?? null)
+        : null,
+    [user?.id],
+  );
+  if (saved === undefined)
+    return (
+      <p role="status" className="p-6">
+        Loading your AIM profile…
+      </p>
+    );
   return (
-    <div className="min-h-screen flex flex-col md:flex-row" style={{ background: 'hsl(var(--bg-primary))' }}>
-      <div className="absolute right-4 top-4"><ThemeToggle /></div>
-      {/* Sidebar Progress */}
-      <div className="md:w-64 shrink-0 p-5 md:p-8" style={{ background: 'hsl(var(--bg-secondary))', borderRight: '1px solid hsl(var(--border))' }}>
-        <div className="mb-10">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold mb-4"
-            style={{
-              background: 'linear-gradient(135deg, hsl(262, 83%, 58%), hsl(var(--accent-light)))',
-              fontFamily: 'var(--font-heading)',
-            }}
-          >
-            <BrandLogo />
-          </div>
-          <h2 className="text-xl font-bold" style={{ color: 'hsl(var(--text-primary))', fontFamily: 'var(--font-heading)' }}>
-            Welcome to CaDeT
-          </h2>
-          <p className="text-xs mt-2" style={{ color: 'hsl(var(--text-secondary))' }}>
-            Let's establish your baseline.
+    <AimWizard
+      key={user?.id}
+      initial={saved?.input ?? emptyAim()}
+      editing={editing}
+    />
+  );
+}
+function AimWizard({
+  initial,
+  editing,
+}: {
+  initial: AimInput;
+  editing: boolean;
+}) {
+  const { user } = useAuth(),
+    navigate = useNavigate();
+  const [input, setInput] = useState(initial),
+    [step, setStep] = useState(0),
+    [busy, setBusy] = useState(false),
+    [error, setError] = useState("");
+  const [skill, setSkill] = useState<Choice>(blankChoice()),
+    [category, setCategory] = useState<SkillCategory>("domain"),
+    [level, setLevel] = useState<SkillLevel>("beginner");
+  const heading = useRef<HTMLHeadingElement>(null),
+    saving = useRef(false);
+  const { specializations, roles, specialization } = aimOptions(input);
+  useEffect(() => {
+    heading.current?.focus();
+  }, [step]);
+  function change<K extends keyof AimInput>(key: K, value: AimInput[K]) {
+    setInput((old) => ({ ...old, [key]: value }));
+    setError("");
+  }
+  function direction(key: "field" | "specialization", value: Choice) {
+    setInput((old) => ({
+      ...old,
+      [key]: value,
+      ...(key === "field"
+        ? {
+            specialization:
+              value.id === "exploring"
+                ? { id: "exploring", other: "" }
+                : blankChoice(),
+          }
+        : {}),
+      role:
+        value.id === "exploring"
+          ? { id: "exploring", other: "" }
+          : blankChoice(),
+    }));
+    setSkill(blankChoice());
+    setError("");
+  }
+  function addSkill() {
+    const name = (skill.id === "other" ? skill.other : skill.id).trim();
+    if (!name) {
+      setError("Choose a skill or specify Other.");
+      return;
+    }
+    if (name.length > 100) {
+      setError("Keep skill names under 100 characters.");
+      return;
+    }
+    if (input.skills.some((s) => s.name.toLowerCase() === name.toLowerCase())) {
+      setError("That skill is already in your baseline.");
+      return;
+    }
+    if (input.skills.length >= 8) {
+      setError("Choose up to eight baseline skills.");
+      return;
+    }
+    change("skills", [...input.skills, { name, category, level }]);
+    setSkill(blankChoice());
+  }
+  async function next() {
+    if (step === 3 && skill.id) {
+      setError(
+        "Add your selected skill to the baseline, or clear the selection before continuing.",
+      );
+      return;
+    }
+    const errors = validateAim(input, step === 5 ? undefined : step);
+    if (errors.length) {
+      setError(errors[0]);
+      return;
+    }
+    if (step < 5) {
+      setStep(step + 1);
+      setError("");
+      return;
+    }
+    if (!user || saving.current) return;
+    saving.current = true;
+    setBusy(true);
+    setError("");
+    try {
+      await saveAim(user.id, input);
+      navigate("/learning-plan", { replace: true });
+    } catch (e) {
+      setError(
+        e instanceof Error
+          ? e.message
+          : "Could not save. Your previous records are unchanged.",
+      );
+    } finally {
+      saving.current = false;
+      setBusy(false);
+    }
+  }
+  const field = (
+    key:
+      | "status"
+      | "experience"
+      | "outcome"
+      | "value"
+      | "environment"
+      | "format"
+      | "support",
+    label: string,
+    options: typeof STATUSES,
+  ) => (
+    <ChoiceField
+      label={label}
+      value={input[key]}
+      options={options}
+      onChange={(value) => change(key, value)}
+    />
+  );
+  return (
+    <div className="aim-layout">
+      <aside className="aim-sidebar">
+        <div className="flex items-center justify-between gap-3">
+          <BrandLogo />
+          <ThemeToggle />
+        </div>
+        <p className="eyebrow mt-6">ACTOR · AIM</p>
+        <h1 className="text-xl font-semibold mt-2">
+          A direction you can act on
+        </h1>
+        <p className="text-sm mt-3">
+          Start broad, narrow your goal, and choose a realistic first step.
+        </p>
+        <ol className="aim-steps" aria-label="Setup progress">
+          {STEPS.map((title, index) => (
+            <li key={title} aria-current={index === step ? "step" : undefined}>
+              <span aria-hidden="true">
+                {index < step ? <Check size={15} /> : index + 1}
+              </span>
+              {title}
+            </li>
+          ))}
+        </ol>
+        {editing && (
+          <Link to="/learning-plan" className="btn btn-secondary">
+            Cancel and return
+          </Link>
+        )}
+      </aside>
+      <main className="aim-main">
+        <form
+          className="aim-form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void next();
+          }}
+        >
+          <p className="eyebrow">
+            Step {step + 1} of {STEPS.length}
           </p>
-        </div>
-
-        <div className="space-y-4">
-          {STEPS.map((s) => {
-            const Icon = s.icon;
-            const isActive = step === s.id;
-            const isPast = step > s.id;
-            return (
-              <div key={s.id} className="flex items-center gap-3">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300 ${isActive ? 'actor-pulse' : ''}`}
-                  style={{
-                    background: isPast ? 'hsl(150, 70%, 45%, 0.15)' : isActive ? 'hsl(262, 83%, 58%, 0.15)' : 'hsl(var(--border))',
-                    color: isPast ? 'hsl(150, 70%, 45%)' : isActive ? 'hsl(var(--accent-light))' : 'hsl(var(--text-muted))',
-                    border: isActive ? '1px solid hsl(262, 83%, 58%, 0.4)' : '1px solid transparent',
-                  }}
-                >
-                  {isPast ? <CheckCircle size={14} /> : <Icon size={14} />}
-                </div>
-                <span className="text-xs font-medium" style={{ color: isActive ? 'hsl(var(--text-primary))' : 'hsl(var(--text-muted))' }}>
-                  {s.title}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Main Content Area */}
-      <div className="flex-1 min-w-0 flex flex-col justify-center items-center p-4 sm:p-6 lg:p-12 relative overflow-hidden">
-        {/* Subtle background glow */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl opacity-10 pointer-events-none"
-          style={{ background: 'hsl(262, 83%, 58%)' }}
-        />
-
-        <div className="w-full max-w-xl z-10">
-          <AnimatePresence mode="wait">
+          <h2
+            ref={heading}
+            tabIndex={-1}
+            className="text-2xl font-semibold mt-2 mb-5"
+          >
+            {STEPS[step]}
+          </h2>
+          <fieldset disabled={busy} className="space-y-5">
             {step === 0 && (
-              <motion.div
-                key="step0"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-6"
-              >
-                <h1 className="text-3xl font-bold" style={{ color: 'hsl(var(--text-primary))', fontFamily: 'var(--font-heading)' }}>
-                  Hello, {user?.fullName?.split(' ')[0] || 'there'}! 👋
-                </h1>
-                <p className="text-sm leading-relaxed" style={{ color: 'hsl(var(--text-secondary))' }}>
-                  CaDeT is a career development operating system powered by the ACTOR framework (Aim, Compress, Test, Own, Run). 
-                  To give you the most accurate insights and track your progress correctly, we need to know where you're starting from.
+              <>
+                {field("status", "Current status", STATUSES)}
+                {field("experience", "Professional experience", EXPERIENCE)}
+                <p className="aim-help">
+                  New to career planning? You can start without any professional
+                  experience or recorded skills.
                 </p>
-                <button onClick={handleNext} className="btn btn-primary">
-                  Get Started <ArrowRight size={16} />
-                </button>
-              </motion.div>
+              </>
             )}
-
             {step === 1 && (
-              <motion.div
-                key="step1"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-6"
-              >
-                <h1 className="text-2xl font-bold" style={{ color: 'hsl(var(--text-primary))', fontFamily: 'var(--font-heading)' }}>
-                  Current Status
-                </h1>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(var(--text-secondary))' }}>
-                      What is your current or most recent role?
-                    </label>
-                    <input
-                      type="text"
-                      className="input-dark w-full"
-                      placeholder="e.g., Junior Frontend Developer, Student, Unemployed"
-                      value={currentRole}
-                      onChange={e => setCurrentRole(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1.5" style={{ color: 'hsl(var(--text-secondary))' }}>
-                      Years of professional experience?
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      className="input-dark w-full md:w-32"
-                      value={yearsExperience}
-                      onChange={e => setYearsExperience(parseInt(e.target.value) || 0)}
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-3 pt-4">
-                  <button onClick={handlePrev} className="btn" style={{ background: 'hsl(var(--border))' }}>
-                    <ArrowLeft size={16} /> Back
-                  </button>
-                  <button onClick={handleNext} className="btn btn-primary" disabled={!currentRole}>
-                    Next Step <ArrowRight size={16} />
-                  </button>
-                </div>
-              </motion.div>
+              <>
+                <ChoiceField
+                  label="Career field"
+                  options={FIELDS}
+                  value={input.field}
+                  onChange={(v) => direction("field", v)}
+                  exploring
+                />
+                <ChoiceField
+                  label="Specialization"
+                  options={specializations}
+                  value={input.specialization}
+                  onChange={(v) => direction("specialization", v)}
+                  exploring
+                  disabled={!input.field.id || input.field.id === "exploring"}
+                />
+                <ChoiceField
+                  label="Target role"
+                  options={roles}
+                  value={input.role}
+                  onChange={(v) => change("role", v)}
+                  exploring
+                  disabled={
+                    !input.specialization.id ||
+                    input.specialization.id === "exploring"
+                  }
+                />
+                <p className="aim-help">
+                  Changing a field resets its specialization and role. Other
+                  keeps your own wording; “Not sure yet” creates an exploration
+                  plan.
+                </p>
+              </>
             )}
-
             {step === 2 && (
-              <motion.div
-                key="step2"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-6"
-              >
-                <h1 className="text-2xl font-bold" style={{ color: 'hsl(var(--text-primary))', fontFamily: 'var(--font-heading)' }}>
-                  Top Skills
-                </h1>
-                <p className="text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>
-                  What are 3-5 skills you are most confident in right now? You can add more later.
-                </p>
-                <div className="space-y-4">
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      className="input-dark flex-1"
-                      placeholder="e.g., React, Python, Project Management"
-                      value={newSkill}
-                      onChange={e => setNewSkill(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && handleAddSkill()}
-                    />
-                    <button onClick={handleAddSkill} className="btn" style={{ background: 'hsl(var(--border))' }}>
-                      Add
-                    </button>
-                  </div>
-                  
-                  {skills.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-4 p-4 rounded-xl" style={{ background: 'hsl(var(--bg-secondary))' }}>
-                      {skills.map(skill => (
-                        <div key={skill} className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm" style={{ background: 'hsl(var(--border))', color: 'hsl(var(--text-primary))' }}>
-                          {skill}
-                          <button onClick={() => setSkills(skills.filter(s => s !== skill))} style={{ color: 'hsl(var(--text-muted))' }}>
-                            &times;
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className="flex gap-3 pt-4">
-                  <button onClick={handlePrev} className="btn" style={{ background: 'hsl(var(--border))' }}>
-                    <ArrowLeft size={16} /> Back
-                  </button>
-                  <button onClick={handleNext} className="btn btn-primary" disabled={skills.length === 0}>
-                    Next Step <ArrowRight size={16} />
-                  </button>
-                </div>
-              </motion.div>
-            )}
-
-            {step === 3 && (
-              <motion.div
-                key="step3"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-6"
-              >
-                <h1 className="text-2xl font-bold" style={{ color: 'hsl(var(--text-primary))', fontFamily: 'var(--font-heading)' }}>
-                  What's the Target?
-                </h1>
-                <p className="text-sm leading-relaxed" style={{ color: 'hsl(var(--text-secondary))' }}>
-                  In one sentence, what is the next major step you are trying to take in your career? 
-                  (It's okay if it's vague, CaDeT will help you compress it later).
-                </p>
-                <div className="space-y-4">
+              <>
+                {field("outcome", "What do you want to achieve?", OUTCOMES)}
+                {field("value", "What matters most to you?", VALUES)}
+                {field(
+                  "environment",
+                  "Preferred work environment",
+                  ENVIRONMENTS,
+                )}
+                <div className="aim-field">
+                  <label htmlFor="milestone">One observable output</label>
                   <textarea
-                    className="input-dark w-full h-32 resize-none"
-                    placeholder="e.g., I want to become a Senior Engineer at a climate tech startup."
-                    value={careerTarget}
-                    onChange={e => setCareerTarget(e.target.value)}
+                    id="milestone"
+                    required
+                    maxLength={500}
+                    className="input-dark w-full"
+                    rows={3}
+                    placeholder="For example: create three portfolio pieces and record feedback on each."
+                    value={input.milestone}
+                    onChange={(e) => change("milestone", e.target.value)}
+                  />
+                  <p className="aim-help">
+                    Include a deliverable and a quantity or quality check. You
+                    will refine this in COMPRESS.
+                  </p>
+                </div>
+                <div className="aim-field">
+                  <label htmlFor="weeks">Timeline</label>
+                  <select
+                    id="weeks"
+                    className="input-dark"
+                    value={input.weeks}
+                    onChange={(e) => change("weeks", Number(e.target.value))}
+                  >
+                    {[2, 4, 8, 12].map((n) => (
+                      <option key={n} value={n}>
+                        {n} weeks
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            )}
+            {step === 3 && (
+              <>
+                <p className="aim-help">
+                  Add up to eight skills, or continue with none. Levels are
+                  self-assessments: beginner 25, intermediate 50, advanced 75,
+                  expert 100. They do not count as verified evidence.
+                </p>
+                <ChoiceField
+                  label="Skill to add (optional)"
+                  value={skill}
+                  options={[
+                    ...new Set([
+                      ...(specialization?.skills ?? []),
+                      "Communication",
+                      "Teamwork",
+                      "Problem solving",
+                    ]),
+                  ].map((name) => ({ id: name, label: name }))}
+                  onChange={setSkill}
+                />
+                <div className="aim-columns">
+                  <ChoiceField
+                    label="Skill category"
+                    value={{ id: category, other: "" }}
+                    options={CATEGORY_OPTIONS}
+                    allowOther={false}
+                    onChange={(v) => setCategory(v.id as SkillCategory)}
+                  />
+                  <ChoiceField
+                    label="Self-assessed level"
+                    value={{ id: level, other: "" }}
+                    options={LEVEL_OPTIONS}
+                    allowOther={false}
+                    onChange={(v) => setLevel(v.id as SkillLevel)}
                   />
                 </div>
-                <div className="flex gap-3 pt-4">
-                  <button onClick={handlePrev} className="btn" style={{ background: 'hsl(var(--border))' }} disabled={isSaving}>
-                    <ArrowLeft size={16} /> Back
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={addSkill}
+                >
+                  Add skill to baseline
+                </button>
+                {skill.id && (
+                  <button
+                    type="button"
+                    className="btn btn-secondary ml-2"
+                    onClick={() => {
+                      setSkill(blankChoice());
+                      setError("");
+                    }}
+                  >
+                    Clear selection
                   </button>
-                  <button onClick={handleComplete} className="btn btn-primary" disabled={!careerTarget || isSaving}>
-                    {isSaving ? 'Saving Profile...' : 'Complete & Enter CaDeT'} <ArrowRight size={16} />
-                  </button>
-                </div>
-              </motion.div>
+                )}
+                <ul className="space-y-2">
+                  {input.skills.map((s) => (
+                    <li className="aim-skill" key={s.name}>
+                      <span>
+                        <strong>{s.name}</strong>
+                        <small>
+                          {s.category} · {s.level}
+                        </small>
+                      </span>
+                      <button
+                        className="btn btn-secondary"
+                        type="button"
+                        aria-label={`Remove ${s.name}`}
+                        onClick={() =>
+                          change(
+                            "skills",
+                            input.skills.filter((x) => x.name !== s.name),
+                          )
+                        }
+                      >
+                        <X size={16} />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </>
             )}
-          </AnimatePresence>
-        </div>
-      </div>
+            {step === 4 && (
+              <>
+                <div className="aim-field">
+                  <label htmlFor="hours">Learning hours per week</label>
+                  <select
+                    id="hours"
+                    className="input-dark"
+                    value={input.hoursPerWeek}
+                    onChange={(e) =>
+                      change("hoursPerWeek", Number(e.target.value))
+                    }
+                  >
+                    {[2, 5, 10, 15].map((n) => (
+                      <option key={n} value={n}>
+                        {n} hours
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {field("format", "Preferred learning format", FORMATS)}
+                {field("support", "Preferred support", SUPPORT)}
+                <div className="aim-columns">
+                  <div className="aim-field">
+                    <label htmlFor="school">
+                      School / organization (optional)
+                    </label>
+                    <input
+                      id="school"
+                      className="input-dark w-full"
+                      maxLength={120}
+                      value={input.school}
+                      onChange={(e) => change("school", e.target.value)}
+                    />
+                  </div>
+                  <div className="aim-field">
+                    <label htmlFor="city">City / province (optional)</label>
+                    <input
+                      id="city"
+                      className="input-dark w-full"
+                      maxLength={120}
+                      value={input.location}
+                      onChange={(e) => change("location", e.target.value)}
+                    />
+                  </div>
+                </div>
+                <p className="aim-help">
+                  Use a school and city name only. We do not need your address.
+                  These preferences stay on this device; no community receives
+                  them automatically.
+                </p>
+              </>
+            )}
+            {step === 5 && (
+              <>
+                <section className="glass-card p-5 space-y-3">
+                  <h3 className="font-semibold">Your starting plan</h3>
+                  <p>{aimSummary(input)}</p>
+                  <p>
+                    {input.hoursPerWeek} hours/week · {input.skills.length}{" "}
+                    baseline skills
+                  </p>
+                  <ol className="list-decimal pl-5 space-y-3">
+                    {learningModules(input).map((m) => (
+                      <li key={m.title}>{m.title}</li>
+                    ))}
+                  </ol>
+                </section>
+                <p className="aim-help">
+                  These are rule-based starter suggestions. Saving creates
+                  categorized goals, a target and four pending tasks. It does
+                  not award evidence or claim you are job-ready.
+                  {editing &&
+                    " Your previous tasks and targets will be kept; this becomes your active target."}
+                </p>
+              </>
+            )}
+          </fieldset>
+          {error && (
+            <p role="alert" className="form-error mt-4">
+              {error}
+            </p>
+          )}
+          <div className="flex flex-wrap gap-3 mt-6">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              disabled={step === 0 || busy}
+              onClick={() => {
+                setStep(step - 1);
+                setError("");
+              }}
+            >
+              <ArrowLeft size={16} /> Back
+            </button>
+            <button
+              type="submit"
+              formNoValidate
+              className="btn btn-primary"
+              disabled={busy}
+            >
+              {busy
+                ? "Saving…"
+                : step === 5
+                  ? "Save AIM & open learning plan"
+                  : "Continue"}
+              <ArrowRight size={16} />
+            </button>
+          </div>
+        </form>
+      </main>
     </div>
   );
 }

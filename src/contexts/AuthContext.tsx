@@ -19,7 +19,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login: async (username, password) => { setId(await verifyLocal(username, password)); },
     signup: async (username, password, name, claim) => { setId(await registerLocal(username, password, name, claim)); },
     logout: async () => { setId(null); },
-    updateProfile: async updates => { if (!id) throw new Error('Sign in first.'); const { fullName, headline, bio, currentRole, yearsExperience, preferredIndustries, onboardingCompleted, onboardingStep } = updates; const allowed = Object.fromEntries(Object.entries({ fullName, headline, bio, currentRole, yearsExperience, preferredIndustries, onboardingCompleted, onboardingStep }).filter(([,v]) => v !== undefined)); await db.profiles.update(id, { ...allowed, updatedAt: new Date().toISOString() }); },
+    updateProfile: async updates => { if (!id) throw new Error('Sign in first.'); const { fullName, headline, bio, currentRole, yearsExperience, preferredIndustries, tutorialCompleted, onboardingCompleted, onboardingStep } = updates; const allowed = Object.fromEntries(Object.entries({ fullName, headline, bio, currentRole, yearsExperience, preferredIndustries, tutorialCompleted, onboardingCompleted, onboardingStep }).filter(([,v]) => v !== undefined)); await db.profiles.update(id, { ...allowed, updatedAt: new Date().toISOString() }); },
   }}>{children}</AuthContext.Provider>;
 }
 export function useAuth() { const value = useContext(AuthContext); if (!value) throw new Error('AuthProvider required'); return value; }
