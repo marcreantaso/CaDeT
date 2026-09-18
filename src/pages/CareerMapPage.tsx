@@ -1,3 +1,7 @@
+import { useLiveQuery } from "dexie-react-hooks";
+import { Link } from "react-router-dom";
+import { db } from "../lib/db";
+import { aimOptions, choiceLabel } from "../lib/aim";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -23,6 +27,9 @@ import {
 
 export function CareerMapPage() {
   const { user } = useAuth();
+  const aim = useLiveQuery(async () => user ? (await db.aim_plans.where("userId").equals(user.id).sortBy("createdAt")).at(-1) ?? null : null, [user?.id]);
+  const unsupportedAim = !!aim && !CAREER_PATH_BY_ID[aim.input.role.id];
+  const declaredRole = aim ? choiceLabel(aim.input.role, aimOptions(aim.input).roles) : null;
   const { data, error, isLoading, retry } = useCareerDigitalTwin();
   const [selectedPathId, setSelectedPathId] = useState<string | null>(null);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
@@ -125,10 +132,11 @@ export function CareerMapPage() {
         <div className="model-label"><Info size={15} /> Alignment measures recorded evidence—not your chance of success.</div>
       </motion.header>
 
+      {unsupportedAim && <section className="glass-card p-5 mb-5"><h2 className="font-semibold">Your chosen role is outside the scored catalogue</h2><p className="my-3">Your AIM direction is {declaredRole}. This simulator currently compares {CAREER_PATHS.length} example roles across several fields. The examples below do not classify your career direction. Your learning plan supports your chosen field.</p><Link className="btn btn-primary" to="/learning-plan">Open my learning plan</Link></section>}
       <section className="twin-summary" aria-label="Digital twin summary">
         <article className="glass-card twin-stat">
           <Target size={20} />
-          <div><span>Suggested starting path</span><strong>{CAREER_PATH_BY_ID[primaryPathId].title}</strong></div>
+          <div><span>{unsupportedAim ? "Catalogue example" : "Model direction"}</span><strong>{CAREER_PATH_BY_ID[primaryPathId].title}</strong></div>
         </article>
         <article className="glass-card twin-stat">
           <Sparkles size={20} />

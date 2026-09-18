@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Check, ChevronRight, Target, Crosshair, FlaskConical, Crown, Rocket, ArrowRight } from 'lucide-react';
@@ -266,6 +267,7 @@ function AimContent() {
         Career ambitions, interests, values, and preferences collected during the AIM stage.
       </p>
       
+      <Link to="/aim" className="btn btn-secondary">Set up or revisit AIM</Link>
       {goals.length === 0 ? (
         <div className="p-4 rounded-xl text-center" style={{ background: 'hsl(var(--bg-secondary))' }}>
           <p className="text-sm" style={{ color: 'hsl(var(--text-secondary))' }}>No goals defined yet.</p>

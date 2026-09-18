@@ -37,7 +37,12 @@ export function DashboardPage() {
       <WelcomeTutorial />
       <ProfileCard />
       <StarterGuide />
-      <Link to="/developer" className="btn btn-secondary mb-5">Developer Options · Pitch guide</Link>
+      <Link to="/learning-plan" className="btn btn-primary mb-5 mr-3">
+        My learning plan
+      </Link>
+      <Link to="/developer" className="btn btn-secondary mb-5">
+        Developer Options · Pitch guide
+      </Link>
       <div className="dashboard-grid">
         <div className="dashboard-focus">
           <NextBestAction />

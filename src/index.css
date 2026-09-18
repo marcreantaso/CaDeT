@@ -913,4 +913,31 @@ svg { flex-shrink: 0; }
 :root[data-theme="light"] .form-success { color: #166534; }
 @media (max-width: 30rem) { .theme-toggle span { display: none; } .top-bar-location { min-width: 0; } }
 
+/* Structured AIM setup keeps native selects usable on touch and keyboard. */
+.aim-layout { display: grid; grid-template-columns: 270px minmax(0,1fr); min-height: 100dvh; background: hsl(var(--bg-primary)); color: hsl(var(--text-primary)); }
+.aim-sidebar { padding: 2rem; background: hsl(var(--bg-secondary)); border-right: 1px solid hsl(var(--border)); }
+.aim-sidebar > p, .aim-help { color: hsl(var(--text-secondary)); line-height: 1.65; font-size: .875rem; }
+.aim-steps { display: grid; gap: 1rem; margin: 2rem 0; }
+.aim-steps li { display: flex; align-items: center; gap: .75rem; font-size: .875rem; color: hsl(var(--text-secondary)); }
+.aim-steps li[aria-current] { color: hsl(var(--accent-light)); font-weight: 600; }
+.aim-steps li > span { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid hsl(var(--border)); border-radius: 50%; flex-shrink: 0; }
+.aim-main { min-width: 0; padding: 3rem 1.5rem; }
+.aim-form { max-width: 680px; margin: auto; }
+.aim-field { display: grid; gap: .5rem; min-width: 0; }
+.aim-field label { font-size: .875rem; font-weight: 500; }
+.aim-field .input-dark { min-height: 46px; font-size: 16px; width: 100%; }
+.aim-field option { color: hsl(var(--text-primary)); background: hsl(var(--bg-secondary)); }
+.aim-columns { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; }
+.aim-skill { display: flex; justify-content: space-between; align-items: center; gap: .75rem; padding: .75rem; background: hsl(var(--bg-secondary)); border-radius: .75rem; overflow-wrap: anywhere; }
+.aim-skill small { display: block; color: hsl(var(--text-secondary)); }
+.learning-card { overflow-wrap: anywhere; }
+@media (max-width: 767px) {
+ .aim-layout { grid-template-columns: minmax(0,1fr); }
+ .aim-sidebar { padding: 1.25rem; border-right: 0; border-bottom: 1px solid hsl(var(--border)); }
+ .aim-steps { grid-template-columns: repeat(2,minmax(0,1fr)); gap: .75rem; margin: 1rem 0 0; }
+ .aim-main { padding: 1.5rem 1rem max(2rem, env(safe-area-inset-bottom)); }
+ .aim-columns { grid-template-columns: minmax(0,1fr); }
+}
+
+
 .starter-choices { display: grid; gap: .75rem; margin-top: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); }

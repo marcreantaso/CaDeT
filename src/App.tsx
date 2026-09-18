@@ -49,7 +49,15 @@ const CareerMapPage = lazy(() =>
   })),
 );
 
-const DeveloperPage = lazy(() => import("./pages/DeveloperPage").then(m => ({ default: m.DeveloperPage })));
+const LearningPlanPage = lazy(() =>
+  import("./pages/LearningPlanPage").then((m) => ({
+    default: m.LearningPlanPage,
+  })),
+);
+
+const DeveloperPage = lazy(() =>
+  import("./pages/DeveloperPage").then((m) => ({ default: m.DeveloperPage })),
+);
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -72,7 +80,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
           >
             <BrandLogo />
           </div>
-          <p className="text-sm" style={{ color: "hsl(var(--text-secondary))" }}>
+          <p
+            className="text-sm"
+            style={{ color: "hsl(var(--text-secondary))" }}
+          >
             Loading...
           </p>
         </div>
@@ -102,7 +113,13 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function AppRoutes() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
+  if (isLoading)
+    return (
+      <p role="status" className="p-6">
+        Loading your account…
+      </p>
+    );
 
   return (
     <Suspense
@@ -137,18 +154,28 @@ function AppRoutes() {
           }
         />
 
+        <Route
+          path="/aim"
+          element={
+            <ProtectedRoute>
+              <OnboardingPage editing />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Protected routes (dark dashboard) */}
         <Route
           path="/"
           element={
             <ProtectedRoute>
-              <ActorProvider key="authenticated-workspace">
+              <ActorProvider key={user?.id}>
                 <AppShell />
               </ActorProvider>
             </ProtectedRoute>
           }
         >
           <Route index element={<DashboardPage />} />
+          <Route path="learning-plan" element={<LearningPlanPage />} />
           <Route path="journey" element={<JourneyPage />} />
           <Route path="records" element={<RecordsPage />} />
           <Route path="developer" element={<DeveloperPage />} />
